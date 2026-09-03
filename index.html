@@ -114,6 +114,271 @@
             font-size: 1.05rem;
         }
 
+        /* === The Cool Names Styling === */
+        .cool-name {
+            display: inline-block;
+            position: relative;
+            background: linear-gradient(135deg, rgba(59, 130, 246, 0.2), rgba(16, 185, 129, 0.2));
+            color: #ffffff;
+            font-weight: 700;
+            padding: 1px 6px;
+            border-radius: 4px;
+            cursor: pointer;
+            box-shadow: 0 0 10px rgba(16, 185, 129, 0.3);
+            transition: transform 0.1s ease, box-shadow 0.2s ease;
+        }
+
+        .cool-name:hover {
+            box-shadow: 0 0 15px rgba(59, 130, 246, 0.5);
+            transform: scale(1.03);
+        }
+
+        .cool-name:active {
+            transform: scale(0.97);
+        }
+
+        /* Simple Confetti Animation CSS */
+        @keyframes confettiBurst {
+            0% { transform: translateY(0) scale(1); opacity: 1; }
+            100% { transform: translateY(-50px) scale(0); opacity: 0; }
+        }
+
+        .confetti {
+            position: absolute;
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0;
+        }
+
+        /* Suggestion Box Form */
+        .feedback-section {
+            margin-top: 35px;
+            padding-top: 25px;
+            border-top: 1px solid rgba(255, 255, 255, 0.08);
+        }
+
+        .feedback-section h2 {
+            font-size: 1.1rem;
+            color: #f8fafc;
+            margin-bottom: 12px;
+        }
+
+        .input-group {
+            display: flex;
+            gap: 10px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            background: rgba(11, 14, 20, 0.8);
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            border-radius: 8px;
+            padding: 12px 16px;
+            color: #ffffff;
+            font-size: 0.95rem;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+
+        input[type="text"]:focus {
+            border-color: #3b82f6;
+        }
+
+        button {
+            background: linear-gradient(135deg, #2563eb, #1d4ed8);
+            color: #ffffff;
+            border: none;
+            border-radius: 8px;
+            padding: 12px 20px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+
+        button:hover {
+            opacity: 0.9;
+        }
+
+        /* Responsive Mobile Layout */
+        @media (max-width: 600px) {
+            .input-group {
+                flex-direction: column;
+            }
+            h1 {
+                font-size: 1.75rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="ambient-glow"></div>
+
+    <div class="container">
+        <!-- Status Indicator -->
+        <div class="status-badge">
+            <span class="pulse-dot"></span> System Live &bull; Initializing Next Phase
+        </div>
+
+        <!-- Main Title & Intro Text -->
+        <h1>Welcome to my <span>new project!</span> 🚀</h1>
+        
+        <p>
+            This is the beginning of my new website, and I’m still deciding what to do with it. 
+            All suggestions and ideas are welcome! I’ll work hard to make it something great.
+        </p>
+
+        <!-- Celebration Section -->
+        <div class="celebration-card">
+            <p>
+                In the meantime, <strong>Congratulations to my amazing wife 
+                    <!-- Teresa with Confetti -->
+                    <span class="cool-name" onclick="celebrateName(this)">Teresa</span> 
+                and my wonderful brother 
+                    <!-- Marcus with Confetti -->
+                    <span class="cool-name" onclick="celebrateName(this)">Marcus</span> 
+                on passing your exams! 🎉👏</strong> 
+                I’m so proud of you both. Your hard work and dedication have truly paid off. May this success be the beginning of many more achievements. ❤️
+            </p>
+        </div>
+
+        <!-- Suggestion Input Box -->
+        <div class="feedback-section">
+            <h2>Have an idea for this site?</h2>
+            <form onsubmit="handleSubmit(event)" class="input-group">
+                <input type="text" id="suggestion" placeholder="Share your suggestions or project ideas..." required>
+                <button type="submit">Send Idea</button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Form submission handler
+        function handleSubmit(event) {
+            event.preventDefault();
+            const input = document.getElementById('suggestion');
+            alert('Thank you for the idea: "' + input.value + '"!');
+            input.value = '';
+        }
+
+        // --- Cool Confetti Trigger ---
+        function celebrateName(element) {
+            const colors = ['#10b981', '#3b82f6', '#f59e0b', '#ef4444', '#ffffff'];
+            const particleCount = 20;
+
+            for (let i = 0; i < particleCount; i++) {
+                createConfetti(element, colors);
+            }
+        }
+
+        function createConfetti(element, colors) {
+            const confetti = document.createElement('div');
+            confetti.className = 'confetti';
+            
+            // Random styling for variety
+            const color = colors[Math.floor(Math.random() * colors.length)];
+            const size = Math.random() * 8 + 4 + 'px';
+            const xOffset = (Math.random() - 0.5) * 60 + 'px'; // Burst width
+            const delay = Math.random() * 0.2 + 's';
+            const duration = Math.random() * 0.5 + 0.8 + 's';
+
+            confetti.style.background = color;
+            confetti.style.width = size;
+            confetti.style.height = size;
+            confetti.style.left = `calc(50% + ${xOffset})`;
+            confetti.style.top = '50%';
+            confetti.style.animation = `confettiBurst ${duration} ease-out ${delay} forwards`;
+
+            // Append, then remove after animation
+            element.appendChild(confetti);
+            setTimeout(() => {
+                confetti.remove();
+            }, 1500); // slightly longer than max duration + delay
+        }
+    </script>
+</body>
+</html>            filter: blur(60px);
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 800px;
+            width: 100%;
+            background: rgba(18, 24, 38, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            backdrop-filter: blur(12px);
+            border-radius: 20px;
+            padding: 40px 30px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+            z-index: 1;
+        }
+
+        /* Header Badges & Decorative Tech Accents */
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(16, 185, 129, 0.1);
+            border: 1px solid rgba(16, 185, 129, 0.3);
+            color: #10b981;
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 24px;
+        }
+
+        .pulse-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #10b981;
+            border-radius: 50%;
+            box-shadow: 0 0 8px #10b981;
+        }
+
+        h1 {
+            font-size: 2.2rem;
+            font-weight: 800;
+            letter-spacing: -0.5px;
+            color: #ffffff;
+            margin-bottom: 20px;
+            line-height: 1.3;
+        }
+
+        h1 span {
+            background: linear-gradient(135deg, #3b82f6 0%, #10b981 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        p {
+            color: #94a3b8;
+            font-size: 1.05rem;
+            line-height: 1.6;
+            margin-bottom: 24px;
+        }
+
+        /* Celebration Glass Card */
+        .celebration-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.03) 0%, rgba(255, 255, 255, 0.01) 100%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-left: 4px solid #ef4444;
+            border-radius: 12px;
+            padding: 24px;
+            margin: 30px 0;
+            position: relative;
+        }
+
+        .celebration-card p {
+            color: #f1f5f9;
+            margin-bottom: 0;
+            font-size: 1.05rem;
+        }
+
         /* Suggestion Box Form */
         .feedback-section {
             margin-top: 35px;
