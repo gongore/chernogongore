@@ -116,3 +116,39 @@ body {
     text-align: center;
     font-size: 0.9rem;
 }
+
+/* Secret Message Box Styles */
+.secret-card h2 {
+    margin-top: 0;
+    color: #a371f7; /* Purple accent to stand out */
+    font-size: 1.4rem;
+    text-align: center;
+}
+
+.message-box {
+    margin-top: 20px;
+    padding: 16px;
+    border-radius: 8px;
+    background: rgba(163, 113, 247, 0.1);
+    border: 1px solid rgba(163, 113, 247, 0.3);
+    text-align: center;
+    transition: all 0.3s ease-in-out;
+}
+
+.message-box h3 {
+    margin-top: 0;
+    color: #d2a8ff;
+    font-size: 1.1rem;
+}
+
+.message-box p {
+    color: #f0f6fc;
+    font-size: 0.95rem;
+    line-height: 1.5;
+    margin-bottom: 0;
+}
+
+/* Helper class to show/hide elements */
+.hidden {
+    display: none;
+}
