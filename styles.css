@@ -117,10 +117,12 @@ body {
     font-size: 0.9rem;
 }
 
-/* Secret Message Box Styles */
+
+
+/* Secret Message Card & Box */
 .secret-card h2 {
     margin-top: 0;
-    color: #a371f7; /* Purple accent to stand out */
+    color: #a371f7;
     font-size: 1.4rem;
     text-align: center;
 }
@@ -147,6 +149,12 @@ body {
     line-height: 1.5;
     margin-bottom: 0;
 }
+
+.hidden {
+    display: none;
+}
+
+
 
 /* Helper class to show/hide elements */
 .hidden {
