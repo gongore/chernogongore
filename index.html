@@ -59,6 +59,25 @@
             <div id="form-result"></div>
         </div>
 
+        <!-- SECTION 3: Secret Code / Personal Message -->
+<div class="glass-card secret-card">
+    <h2>Access Personal Message</h2>
+    <p class="subtitle">Enter your passcode below to view a customized message.</p>
+
+    <div class="form-group">
+        <label for="passcode-input">Enter Passcode</label>
+        <input type="password" id="passcode-input" placeholder="e.g. 1234 or your code">
+    </div>
+
+    <button type="button" class="submit-btn" id="unlock-btn">Unlock Message</button>
+
+    <!-- The secret message box (hidden by default) -->
+    <div id="secret-message-box" class="message-box hidden">
+        <h3 id="message-title"></h3>
+        <p id="message-text"></p>
+    </div>
+</div>
+
     </div>
 
     <!-- Link to External JavaScript File -->
