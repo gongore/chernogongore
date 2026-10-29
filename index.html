@@ -3,14 +3,14 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>chernogongore.com | Macro Analytics & Fed Watch</title>
+    <title>chernogongore.com | S&P 500 & Macro Analytics</title>
     
     <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     
-    <!-- Chart.js -->
+    <!-- Chart.js CDN -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
     <style>
@@ -313,8 +313,8 @@
     <main class="main-container">
         
         <div class="section-header">
-            <h1>Treasury Yields, Equities & Fed Watch</h1>
-            <p class="subtitle">Real-time benchmark rates, broad market indices, and automated economic release tracking.</p>
+            <h1>S&P 500, Treasury Yields & Fed Watch</h1>
+            <p class="subtitle">Real-time benchmark rates, broad market equity performance, and automated economic release tracking.</p>
         </div>
 
         <div class="metrics-grid">
@@ -371,14 +371,14 @@
         </div>
 
         <div class="dashboard-grid">
-            <!-- Treasury Yield Trend Chart -->
+            <!-- S&P 500 Trend Chart (Replaces 10-Year Treasury Chart) -->
             <div class="glass-card chart-card">
                 <div class="card-title">
-                    <span>10-Year Treasury Trend</span>
-                    <span style="font-size: 0.8rem; font-weight: 400; color: var(--text-dim);">Daily History</span>
+                    <span>S&P 500 Performance Index (SPX)</span>
+                    <span style="font-size: 0.8rem; font-weight: 400; color: var(--text-dim);">6-Month History</span>
                 </div>
                 <div class="chart-wrapper">
-                    <canvas id="treasuryChart"></canvas>
+                    <canvas id="spxChart"></canvas>
                 </div>
             </div>
 
@@ -485,39 +485,71 @@
             }
         }
 
-        // Initialize Chart.js Trend
-        function initChart() {
-            const ctx = document.getElementById('treasuryChart').getContext('2d');
+        // Initialize S&P 500 (SPX) Chart
+        function initSpxChart() {
+            const ctx = document.getElementById('spxChart').getContext('2d');
+            
+            // Gradient fill for SPX chart
+            const gradient = ctx.createLinearGradient(0, 0, 0, 260);
+            gradient.addColorStop(0, 'rgba(16, 185, 129, 0.25)');
+            gradient.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
+
             new Chart(ctx, {
                 type: 'line',
                 data: {
                     labels: ['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
                     datasets: [{
-                        label: '10Y Yield (%)',
-                        data: [4.42, 4.58, 4.65, 4.80, 4.91, 5.00],
-                        borderColor: '#6366F1',
-                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
-                        borderWidth: 2,
+                        label: 'S&P 500 Index (SPX)',
+                        data: [6850.12, 7120.45, 7310.80, 7240.15, 7510.30, 7696.89],
+                        borderColor: '#10B981',
+                        backgroundColor: gradient,
+                        borderWidth: 2.5,
                         fill: true,
-                        tension: 0.3,
+                        tension: 0.35,
                         pointRadius: 4,
-                        pointBackgroundColor: '#6366F1'
+                        pointHoverRadius: 6,
+                        pointBackgroundColor: '#10B981'
                     }]
                 },
                 options: {
                     responsive: true,
                     maintainAspectRatio: false,
-                    plugins: { legend: { display: false } },
+                    plugins: { 
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(11, 15, 25, 0.95)',
+                            titleColor: '#F3F4F6',
+                            bodyColor: '#10B981',
+                            borderColor: 'rgba(255, 255, 255, 0.1)',
+                            borderWidth: 1,
+                            callbacks: {
+                                label: function(context) {
+                                    return ` SPX: ${context.parsed.y.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
+                                }
+                            }
+                        }
+                    },
                     scales: {
-                        x: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#9CA3AF' } },
-                        y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#9CA3AF' } }
+                        x: { 
+                            grid: { color: 'rgba(255, 255, 255, 0.04)' }, 
+                            ticks: { color: '#9CA3AF' } 
+                        },
+                        y: { 
+                            grid: { color: 'rgba(255, 255, 255, 0.04)' }, 
+                            ticks: { 
+                                color: '#9CA3AF',
+                                callback: function(value) {
+                                    return value.toLocaleString('en-US');
+                                }
+                            } 
+                        }
                     }
                 }
             });
         }
 
         document.addEventListener('DOMContentLoaded', () => {
-            initChart();
+            initSpxChart();
             updateCountdowns();
             setInterval(updateCountdowns, 1000);
         });
