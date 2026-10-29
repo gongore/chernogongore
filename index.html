@@ -237,4 +237,290 @@
             transition: border-color 0.2s ease;
         }
 
-        .event-box.active-
+        .event-box.active-event {
+            border-color: var(--border-highlight);
+            background: rgba(99, 102, 241, 0.05);
+        }
+
+        .event-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .event-type {
+            font-size: 0.8rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--accent-cyan);
+        }
+
+        .event-status {
+            font-size: 0.75rem;
+            padding: 0.2rem 0.5rem;
+            border-radius: 4px;
+            background: rgba(99, 102, 241, 0.2);
+            color: #A5B4FC;
+            font-weight: 600;
+        }
+
+        .event-date {
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.25rem;
+        }
+
+        .event-details {
+            font-size: 0.85rem;
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+        }
+
+        .countdown-timer {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.875rem;
+            color: var(--accent-gold);
+            background: rgba(245, 158, 11, 0.1);
+            padding: 0.4rem 0.6rem;
+            border-radius: 6px;
+            display: inline-block;
+        }
+
+        .app-footer {
+            border-top: 1px solid var(--border-glass);
+            padding: 1.5rem;
+            text-align: center;
+            color: var(--text-dim);
+            font-size: 0.85rem;
+            margin-top: auto;
+        }
+    </style>
+</head>
+<body>
+
+    <header class="navbar">
+        <div class="nav-container">
+            <a href="#" class="brand-logo">chernogongore<span class="accent-dot">.com</span></a>
+            <div class="live-status-pill">
+                <span class="status-dot"></span>
+                <span id="market-status-text">LIVE MACRO DASHBOARD</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="main-container">
+        
+        <div class="section-header">
+            <h1>Treasury Yields, Equities & Fed Watch</h1>
+            <p class="subtitle">Real-time benchmark rates, broad market indices, and automated economic release tracking.</p>
+        </div>
+
+        <div class="metrics-grid">
+            <!-- 10-Yr Treasury Yield -->
+            <div class="glass-card metric-card">
+                <div class="metric-header">
+                    <span class="metric-title">10-Yr Yield</span>
+                    <span class="metric-badge">US10Y</span>
+                </div>
+                <div class="metric-value" id="us10y-val">5.00%</div>
+                <div class="metric-footer">
+                    <span class="positive" id="us10y-change">+0.04% (+0.80%)</span>
+                    <span style="color: var(--text-dim);">Today</span>
+                </div>
+            </div>
+
+            <!-- Fed Funds Rate -->
+            <div class="glass-card metric-card">
+                <div class="metric-header">
+                    <span class="metric-title">Fed Funds Rate</span>
+                    <span class="metric-badge">Target Range</span>
+                </div>
+                <div class="metric-value" id="fed-rate-val">3.75% - 4.00%</div>
+                <div class="metric-footer">
+                    <span style="color: var(--text-muted);">Effective Rate: 3.88%</span>
+                </div>
+            </div>
+
+            <!-- S&P 500 Index -->
+            <div class="glass-card metric-card">
+                <div class="metric-header">
+                    <span class="metric-title">S&P 500 Index</span>
+                    <span class="metric-badge">SPX</span>
+                </div>
+                <div class="metric-value" id="spx-val">7,696.89</div>
+                <div class="metric-footer">
+                    <span class="positive" id="spx-change">+30.44 (+0.40%)</span>
+                    <span style="color: var(--text-dim);">Today</span>
+                </div>
+            </div>
+
+            <!-- Bitcoin -->
+            <div class="glass-card metric-card">
+                <div class="metric-header">
+                    <span class="metric-title">Bitcoin</span>
+                    <span class="metric-badge">BTC / USD</span>
+                </div>
+                <div class="metric-value" id="btc-val">$80,771</div>
+                <div class="metric-footer">
+                    <span class="negative" id="btc-change">-1.20%</span>
+                    <span style="color: var(--text-dim);">24h</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="dashboard-grid">
+            <!-- Treasury Yield Trend Chart -->
+            <div class="glass-card chart-card">
+                <div class="card-title">
+                    <span>10-Year Treasury Trend</span>
+                    <span style="font-size: 0.8rem; font-weight: 400; color: var(--text-dim);">Daily History</span>
+                </div>
+                <div class="chart-wrapper">
+                    <canvas id="treasuryChart"></canvas>
+                </div>
+            </div>
+
+            <!-- Automated Economic Calendar -->
+            <div class="glass-card calendar-card">
+                <div class="card-title">
+                    <span>Economic Calendar</span>
+                    <span style="font-size: 0.8rem; font-weight: 400; color: var(--text-dim);">Auto-Rollover</span>
+                </div>
+
+                <!-- Next Fed Meeting Card -->
+                <div class="event-box active-event" id="fomc-card">
+                    <div class="event-header">
+                        <span class="event-type">FOMC Rate Decision</span>
+                        <span class="event-status" id="fomc-badge">Upcoming</span>
+                    </div>
+                    <div class="event-date" id="fomc-date">Dec 8–9, 2026</div>
+                    <div class="event-details" id="fomc-time">Announcement: Dec 9 at 2:00 PM ET</div>
+                    <div class="countdown-timer" id="fomc-timer">Calculating countdown...</div>
+                </div>
+
+                <!-- Next CPI Release Card -->
+                <div class="event-box" id="cpi-card">
+                    <div class="event-header">
+                        <span class="event-type" style="color: var(--accent-gold);">CPI Inflation Data</span>
+                        <span class="event-status" id="cpi-badge">Upcoming</span>
+                    </div>
+                    <div class="event-date" id="cpi-date">Nov 10, 2026</div>
+                    <div class="event-details" id="cpi-time">Release: Nov 10 at 8:30 AM ET</div>
+                    <div class="countdown-timer" id="cpi-timer">Calculating countdown...</div>
+                </div>
+            </div>
+        </div>
+
+    </main>
+
+    <footer class="app-footer">
+        <p>&copy; 2026 chernogongore.com — Macro Analytics & Market Intelligence</p>
+    </footer>
+
+    <script>
+        // Schedule of Events (2026–2027)
+        const FOMC_SCHEDULE = [
+            { label: "Dec 8–9, 2026", targetIso: "2026-12-09T14:00:00-05:00", details: "Announcement: Dec 9 at 2:00 PM ET" },
+            { label: "Jan 27–28, 2027", targetIso: "2027-01-28T14:00:00-05:00", details: "Announcement: Jan 28 at 2:00 PM ET" },
+            { label: "Mar 16–17, 2027", targetIso: "2027-03-17T14:00:00-05:00", details: "Announcement: Mar 17 at 2:00 PM ET" }
+        ];
+
+        const CPI_SCHEDULE = [
+            { label: "Nov 10, 2026", targetIso: "2026-11-10T08:30:00-05:00", details: "Release: Oct CPI at 8:30 AM ET" },
+            { label: "Dec 11, 2026", targetIso: "2026-12-11T08:30:00-05:00", details: "Release: Nov CPI at 8:30 AM ET" },
+            { label: "Jan 13, 2027", targetIso: "2027-01-13T08:30:00-05:00", details: "Release: Dec CPI at 8:30 AM ET" }
+        ];
+
+        // Automated 24-Hour Post-Event Rollover Logic
+        function getNextEvent(schedule) {
+            const now = new Date();
+            const ROLLOVER_BUFFER_MS = 24 * 60 * 60 * 1000; // 24 Hours
+
+            for (let event of schedule) {
+                const eventTime = new Date(event.targetIso);
+                if (now.getTime() < (eventTime.getTime() + ROLLOVER_BUFFER_MS)) {
+                    return event;
+                }
+            }
+            return schedule[schedule.length - 1];
+        }
+
+        function updateCountdowns() {
+            // Process FOMC Event
+            const fomcEvent = getNextEvent(FOMC_SCHEDULE);
+            document.getElementById('fomc-date').textContent = fomcEvent.label;
+            document.getElementById('fomc-time').textContent = fomcEvent.details;
+            renderTimer('fomc-timer', 'fomc-badge', fomcEvent.targetIso);
+
+            // Process CPI Event
+            const cpiEvent = getNextEvent(CPI_SCHEDULE);
+            document.getElementById('cpi-date').textContent = cpiEvent.label;
+            document.getElementById('cpi-time').textContent = cpiEvent.details;
+            renderTimer('cpi-timer', 'cpi-badge', cpiEvent.targetIso);
+        }
+
+        function renderTimer(timerId, badgeId, isoString) {
+            const now = new Date();
+            const target = new Date(isoString);
+            const diffMs = target - now;
+            const pastMs = now - target;
+            const ROLLOVER_BUFFER_MS = 24 * 60 * 60 * 1000;
+
+            const timerEl = document.getElementById(timerId);
+            const badgeEl = document.getElementById(badgeId);
+
+            if (diffMs > 0) {
+                const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const mins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+                const secs = Math.floor((diffMs % (1000 * 60)) / 1000);
+
+                timerEl.textContent = `T- ${days}d ${hours}h ${mins}m ${secs}s`;
+                badgeEl.textContent = "Upcoming";
+            } else if (pastMs <= ROLLOVER_BUFFER_MS) {
+                timerEl.textContent = "Active / Release Completed Today";
+                badgeEl.textContent = "Active Today";
+            }
+        }
+
+        // Initialize Chart.js Trend
+        function initChart() {
+            const ctx = document.getElementById('treasuryChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: ['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
+                    datasets: [{
+                        label: '10Y Yield (%)',
+                        data: [4.42, 4.58, 4.65, 4.80, 4.91, 5.00],
+                        borderColor: '#6366F1',
+                        backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                        borderWidth: 2,
+                        fill: true,
+                        tension: 0.3,
+                        pointRadius: 4,
+                        pointBackgroundColor: '#6366F1'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: { legend: { display: false } },
+                    scales: {
+                        x: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#9CA3AF' } },
+                        y: { grid: { color: 'rgba(255, 255, 255, 0.05)' }, ticks: { color: '#9CA3AF' } }
+                    }
+                }
+            });
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            initChart();
+            updateCountdowns();
+            setInterval(updateCountdowns, 1000);
+        });
+    </script>
+</body>
+</html>
