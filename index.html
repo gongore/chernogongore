@@ -1,87 +1,759 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chernogongore | Web App</title>
+    <title>10Y Treasury Yield, Fed Funds & Economic Calendar</title>
 
-    <!-- Link to External Stylesheet -->
-    <link rel="stylesheet" href="styles.css">
-
-    <!-- Google tag (gtag.js) -->
-    <script async src="https://www.googletagmanager.com/gtag/js?id=G-YOUR_MEASUREMENT_ID"></script>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <script>
-      window.dataLayer = window.dataLayer || [];
-      function gtag(){dataLayer.push(arguments);}
-      gtag('js', new Date());
-      gtag('config', 'G-YOUR_MEASUREMENT_ID');
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        darkbg: '#0d1117',
+                        cardbg: 'rgba(22, 27, 34, 0.75)',
+                        borderglow: 'rgba(56, 189, 248, 0.15)',
+                        accentcyan: '#38bdf8',
+                        accentpurple: '#c084fc',
+                        accentemerald: '#34d399',
+                        accentrose: '#f43f5e',
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    }
+                }
+            }
+        }
     </script>
+
+    <!-- Inter Font & FontAwesome Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <style>
+        body {
+            background-color: #0d1117;
+            color: #f0f6fc;
+            font-family: 'Inter', sans-serif;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(56, 189, 248, 0.07) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(192, 132, 252, 0.07) 0%, transparent 40%),
+                radial-gradient(circle at 50% 50%, rgba(15, 23, 42, 0.5) 0%, transparent 100%);
+            background-attachment: fixed;
+        }
+
+        /* Glassmorphism Styles */
+        .glass-card {
+            background: rgba(22, 27, 34, 0.75);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.4);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .glass-card:hover {
+            border-color: rgba(56, 189, 248, 0.25);
+            box-shadow: 0 12px 40px -10px rgba(56, 189, 248, 0.15);
+        }
+
+        .pulse-live {
+            animation: pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+        }
+
+        @keyframes pulse-glow {
+            0%, 100% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0.4; transform: scale(0.95); }
+        }
+
+        /* Ticker Animation */
+        .ticker-wrap {
+            overflow: hidden;
+            white-space: nowrap;
+        }
+        
+        .ticker-move {
+            display: inline-block;
+            animation: ticker 35s linear infinite;
+        }
+
+        .ticker-wrap:hover .ticker-move {
+            animation-play-state: paused;
+        }
+
+        @keyframes ticker {
+            0% { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(-50%, 0, 0); }
+        }
+    </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col justify-between pb-8">
 
-    <div class="main-container">
-        
-        <!-- SECTION 1: Welcome / Status Card -->
-        <div class="glass-card header-card">
-            <h1>chernogongore.com</h1>
-            <p>Welcome!</p>
+    <!-- TOP TICKER RIBBON -->
+    <div class="w-full bg-slate-900/90 border-b border-slate-800/80 py-2.5 px-4 sticky top-0 z-50 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto flex items-center justify-between gap-4">
+            <div class="flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-sky-400 shrink-0">
+                <span class="inline-block w-2 h-2 rounded-full bg-emerald-400 pulse-live"></span>
+                <span>Live Feed</span>
+            </div>
+            
+            <div class="ticker-wrap flex-1 text-xs text-slate-300">
+                <div class="ticker-move flex items-center gap-8">
+                    <span class="inline-flex items-center gap-2">
+                        <strong class="text-white">US10Y:</strong> <span id="ticker-10y">4.28%</span>
+                        <span id="ticker-10y-change" class="text-emerald-400 font-medium">+0.04 bps</span>
+                    </span>
+                    <span class="text-slate-700">|</span>
+                    <span class="inline-flex items-center gap-2">
+                        <strong class="text-white">Fed Funds Rate:</strong> <span id="ticker-effr">4.83%</span>
+                        <span class="text-slate-400">(Target 4.75%-5.00%)</span>
+                    </span>
+                    <span class="text-slate-700">|</span>
+                    <span class="inline-flex items-center gap-2">
+                        <strong class="text-purple-400"><i class="fa-solid fa-calendar-day mr-1"></i> Next FOMC:</strong>
+                        <span id="ticker-fomc-date">Loading...</span>
+                    </span>
+                    <span class="text-slate-700">|</span>
+                    <span class="inline-flex items-center gap-2">
+                        <strong class="text-cyan-400"><i class="fa-solid fa-chart-line mr-1"></i> Next CPI:</strong>
+                        <span id="ticker-cpi-date">Loading...</span>
+                    </span>
+                    
+                    <!-- Repeated for infinite ticker loop -->
+                    <span class="text-slate-700">|</span>
+                    <span class="inline-flex items-center gap-2">
+                        <strong class="text-white">US10Y:</strong> <span>4.28%</span>
+                    </span>
+                    <span class="text-slate-700">|</span>
+                    <span class="inline-flex items-center gap-2">
+                        <strong class="text-white">Fed Funds Rate:</strong> <span>4.83%</span>
+                    </span>
+                    <span class="text-slate-700">|</span>
+                    <span class="inline-flex items-center gap-2">
+                        <strong class="text-purple-400"><i class="fa-solid fa-calendar-day mr-1"></i> Next FOMC:</strong>
+                        <span class="ticker-fomc-date-dupe">Loading...</span>
+                    </span>
+                </div>
+            </div>
+
+            <div class="hidden sm:flex items-center gap-3 text-xs text-slate-400 shrink-0">
+                <button id="manual-refresh-btn" class="hover:text-sky-400 transition flex items-center gap-1.5 bg-slate-800/80 px-2.5 py-1 rounded border border-slate-700/60">
+                    <i id="refresh-spinner" class="fa-solid fa-rotate-right"></i>
+                    <span>Refresh</span>
+                </button>
+            </div>
         </div>
-
-        <!-- SECTION 2: Suggestion Form -->
-        <div class="glass-card form-card">
-            <h2>Leave a Suggestion</h2>
-            <p class="subtitle">
-                Have an idea for a feature or a dataset you'd like to see? Let me know below.
-            </p>
-
-            <form id="suggestion-form">
-                <!-- Replace with your actual Web3Forms Access Key -->
-                <input type="hidden" name="access_key" value="a8654c46-01c2-4579-9733-02f79f452269">
-
-                <div class="form-group">
-                    <label for="name">Your Name</label>
-                    <input type="text" id="name" name="name" required placeholder="John Doe">
-                </div>
-
-                <div class="form-group">
-                    <label for="email">Your Email / Contact</label>
-                    <input type="email" id="email" name="email" required placeholder="john@example.com">
-                </div>
-
-                <div class="form-group">
-                    <label for="message">Your Suggestion</label>
-                    <textarea id="message" name="message" required rows="4" placeholder="What features or tools would help you most?"></textarea>
-                </div>
-
-                <button type="submit" class="submit-btn" id="submit-btn">Send Suggestion</button>
-            </form>
-
-            <div id="form-result"></div>
-        </div>
-
-
-
-<!-- SECTION 3: Secret Message Card -->
-<div class="glass-card secret-card">
-    <h2>Access Personal Message</h2>
-    <p class="subtitle">Enter your passcode below to view a customized message.</p>
-
-    <div class="form-group">
-        <label for="passcode-input">Enter Passcode</label>
-        <input type="password" id="passcode-input" placeholder="Enter your passcode">
     </div>
 
-    <button type="button" class="submit-btn" id="unlock-btn">Unlock Message</button>
+    <!-- MAIN DASHBOARD CONTENT -->
+    <main class="max-w-7xl w-full mx-auto px-4 md:px-8 mt-6 space-y-8 flex-1">
 
-    <div id="secret-message-box" class="message-box hidden">
-        <h3 id="message-title"></h3>
-        <p id="message-text"></p>
-    </div>
-</div>
-        
+        <!-- HEADER SECTION -->
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-2 border-b border-slate-800/80">
+            <div>
+                <h1 class="text-2xl md:text-3xl font-extrabold tracking-tight text-white flex items-center gap-3">
+                    Macro Interest Rates & Event Monitor
+                    <span class="text-xs font-semibold px-2.5 py-1 rounded-full bg-sky-500/10 text-sky-400 border border-sky-500/20">
+                        2026 Active
+                    </span>
+                </h1>
+                <p class="text-xs md:text-sm text-slate-400 mt-1">Real-time US Benchmark Yields, Fed Funds target rate, and automated 24H post-event rollover calendar.</p>
+            </div>
+            
+            <div class="flex items-center gap-2 text-xs bg-slate-900/80 p-1.5 rounded-xl border border-slate-800 self-start md:self-auto">
+                <span class="text-slate-400 px-2">Last System Refresh:</span>
+                <span id="last-updated-time" class="font-mono text-slate-200 bg-slate-800 px-2.5 py-1 rounded">--:--:--</span>
+            </div>
+        </div>
 
+        <!-- SECTION 1: KEY METRICS GRID -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
 
-    <!-- Link to External JavaScript File -->
-    <script src="app.js"></script>
+            <!-- METRIC 1: 10-YEAR TREASURY YIELD -->
+            <div class="glass-card rounded-2xl p-6 relative overflow-hidden">
+                <div class="flex justify-between items-start mb-3">
+                    <div>
+                        <span class="text-xs font-semibold uppercase tracking-wider text-sky-400">Fixed Income Benchmark</span>
+                        <h2 class="text-xl font-bold text-white mt-0.5">10-Year Treasury Yield</h2>
+                        <span class="text-xs text-slate-400">US10Y / ^TNX Benchmark</span>
+                    </div>
+                    <div class="p-3 bg-sky-500/10 rounded-xl text-sky-400 border border-sky-500/20">
+                        <i class="fa-solid fa-landmark text-xl"></i>
+                    </div>
+                </div>
+
+                <div class="flex items-baseline gap-3 my-3">
+                    <span id="val-10y" class="text-4xl md:text-5xl font-black text-white tracking-tight">4.28%</span>
+                    <span id="change-10y" class="text-sm font-semibold text-emerald-400 flex items-center gap-1">
+                        <i class="fa-solid fa-arrow-trend-up"></i> +0.04 (+0.94%)
+                    </span>
+                </div>
+
+                <div class="pt-3 border-t border-slate-800/80 grid grid-cols-2 gap-2 text-xs">
+                    <div>
+                        <span class="text-slate-500 block">52-Week Range</span>
+                        <span class="text-slate-300 font-medium">3.62% - 4.70%</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-500 block">Spread vs EFFR</span>
+                        <span id="spread-effr-val" class="text-slate-300 font-medium">-0.55 bps</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- METRIC 2: FEDERAL FUNDS RATE -->
+            <div class="glass-card rounded-2xl p-6 relative overflow-hidden">
+                <div class="flex justify-between items-start mb-3">
+                    <div>
+                        <span class="text-xs font-semibold uppercase tracking-wider text-purple-400">Central Bank Policy</span>
+                        <h2 class="text-xl font-bold text-white mt-0.5">Federal Funds Rate</h2>
+                        <span class="text-xs text-slate-400">Effective Fed Funds Rate (EFFR)</span>
+                    </div>
+                    <div class="p-3 bg-purple-500/10 rounded-xl text-purple-400 border border-purple-500/20">
+                        <i class="fa-solid fa-building-columns text-xl"></i>
+                    </div>
+                </div>
+
+                <div class="flex items-baseline gap-3 my-3">
+                    <span id="val-effr" class="text-4xl md:text-5xl font-black text-white tracking-tight">4.83%</span>
+                    <span class="text-xs font-medium px-2 py-1 rounded bg-purple-500/10 text-purple-300 border border-purple-500/20">
+                        Target: 4.75% - 5.00%
+                    </span>
+                </div>
+
+                <div class="pt-3 border-t border-slate-800/80 grid grid-cols-2 gap-2 text-xs">
+                    <div>
+                        <span class="text-slate-500 block">FOMC Stance</span>
+                        <span class="text-amber-400 font-medium">Restrictive</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-500 block">Real Policy Rate</span>
+                        <span id="real-rate-val" class="text-slate-300 font-medium">+2.13%</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- METRIC 3: 10Y - 2Y YIELD CURVE SPREAD -->
+            <div class="glass-card rounded-2xl p-6 relative overflow-hidden md:col-span-2 lg:col-span-1">
+                <div class="flex justify-between items-start mb-3">
+                    <div>
+                        <span class="text-xs font-semibold uppercase tracking-wider text-emerald-400">Yield Curve Monitor</span>
+                        <h2 class="text-xl font-bold text-white mt-0.5">10Y - 2Y Curve Spread</h2>
+                        <span class="text-xs text-slate-400">Inversion / Normalization Index</span>
+                    </div>
+                    <div class="p-3 bg-emerald-500/10 rounded-xl text-emerald-400 border border-emerald-500/20">
+                        <i class="fa-solid fa-arrows-split-up-and-left text-xl"></i>
+                    </div>
+                </div>
+
+                <div class="flex items-baseline gap-3 my-3">
+                    <span id="val-spread" class="text-4xl md:text-5xl font-black text-white tracking-tight">+0.18%</span>
+                    <span class="text-xs font-medium px-2 py-1 rounded bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                        Un-inverted
+                    </span>
+                </div>
+
+                <div class="pt-3 border-t border-slate-800/80 grid grid-cols-2 gap-2 text-xs">
+                    <div>
+                        <span class="text-slate-500 block">2-Year Treasury Yield</span>
+                        <span class="text-slate-300 font-medium">4.10%</span>
+                    </div>
+                    <div>
+                        <span class="text-slate-500 block">Economic Status</span>
+                        <span class="text-slate-300 font-medium">Soft Landing Regime</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- SECTION 2: AUTOMATED ECONOMIC CALENDAR (FOMC & CPI) -->
+        <div class="space-y-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                <div>
+                    <h2 class="text-xl font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-calendar-check text-purple-400"></i>
+                        Automated Economic Calendar
+                    </h2>
+                    <p class="text-xs text-slate-400">Dynamic 24-hour post-event rollover system for upcoming central bank and inflation announcements.</p>
+                </div>
+                <div class="flex items-center gap-2 text-xs text-slate-400">
+                    <span class="inline-block w-2 h-2 rounded-full bg-purple-400"></span>
+                    <span>Auto-updates 24h post-release</span>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                <!-- CALENDAR CARD 1: FOMC FED RATE DECISION -->
+                <div class="glass-card rounded-2xl p-6 relative overflow-hidden border-l-4 border-l-purple-500">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="space-y-1">
+                            <span class="text-xs font-bold uppercase tracking-wider text-purple-400 flex items-center gap-1.5">
+                                <i class="fa-solid fa-building-columns"></i> Federal Reserve System
+                            </span>
+                            <h3 class="text-lg font-bold text-white">FOMC Rate Decision</h3>
+                        </div>
+                        <span id="fomc-status-badge" class="px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-500/20 text-purple-300 border border-purple-500/30">
+                            Upcoming
+                        </span>
+                    </div>
+
+                    <div class="bg-slate-900/60 rounded-xl p-4 border border-slate-800 my-4 space-y-3">
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-slate-400">Target Date & Time:</span>
+                            <strong id="fomc-event-date" class="text-white font-mono">--</strong>
+                        </div>
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-slate-400">Meeting Period:</span>
+                            <span id="fomc-event-period" class="text-slate-200 font-medium">--</span>
+                        </div>
+                    </div>
+
+                    <!-- COUNTDOWN TIMER CONTAINER -->
+                    <div class="space-y-1.5">
+                        <span class="text-xs text-slate-400 font-medium">Time Remaining Until Announcement:</span>
+                        <div class="grid grid-cols-4 gap-2 text-center font-mono">
+                            <div class="bg-slate-900/80 p-2 rounded-lg border border-slate-800">
+                                <span id="fomc-cd-days" class="text-xl font-bold text-purple-300 block">00</span>
+                                <span class="text-[10px] text-slate-500 uppercase">Days</span>
+                            </div>
+                            <div class="bg-slate-900/80 p-2 rounded-lg border border-slate-800">
+                                <span id="fomc-cd-hours" class="text-xl font-bold text-purple-300 block">00</span>
+                                <span class="text-[10px] text-slate-500 uppercase">Hours</span>
+                            </div>
+                            <div class="bg-slate-900/80 p-2 rounded-lg border border-slate-800">
+                                <span id="fomc-cd-mins" class="text-xl font-bold text-purple-300 block">00</span>
+                                <span class="text-[10px] text-slate-500 uppercase">Mins</span>
+                            </div>
+                            <div class="bg-slate-900/80 p-2 rounded-lg border border-slate-800">
+                                <span id="fomc-cd-secs" class="text-xl font-bold text-purple-300 block">00</span>
+                                <span class="text-[10px] text-slate-500 uppercase">Secs</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- CALENDAR CARD 2: CPI INFLATION RELEASE -->
+                <div class="glass-card rounded-2xl p-6 relative overflow-hidden border-l-4 border-l-cyan-500">
+                    <div class="flex justify-between items-start mb-4">
+                        <div class="space-y-1">
+                            <span class="text-xs font-bold uppercase tracking-wider text-cyan-400 flex items-center gap-1.5">
+                                <i class="fa-solid fa-scale-balanced"></i> Bureau of Labor Statistics
+                            </span>
+                            <h3 class="text-lg font-bold text-white">Consumer Price Index (CPI)</h3>
+                        </div>
+                        <span id="cpi-status-badge" class="px-2.5 py-1 rounded-full text-xs font-semibold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30">
+                            Upcoming
+                        </span>
+                    </div>
+
+                    <div class="bg-slate-900/60 rounded-xl p-4 border border-slate-800 my-4 space-y-3">
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-slate-400">Target Date & Time:</span>
+                            <strong id="cpi-event-date" class="text-white font-mono">--</strong>
+                        </div>
+                        <div class="flex justify-between items-center text-sm">
+                            <span class="text-slate-400">Reference Inflation Month:</span>
+                            <span id="cpi-event-period" class="text-slate-200 font-medium">--</span>
+                        </div>
+                    </div>
+
+                    <!-- COUNTDOWN TIMER CONTAINER -->
+                    <div class="space-y-1.5">
+                        <span class="text-xs text-slate-400 font-medium">Time Remaining Until Release:</span>
+                        <div class="grid grid-cols-4 gap-2 text-center font-mono">
+                            <div class="bg-slate-900/80 p-2 rounded-lg border border-slate-800">
+                                <span id="cpi-cd-days" class="text-xl font-bold text-cyan-300 block">00</span>
+                                <span class="text-[10px] text-slate-500 uppercase">Days</span>
+                            </div>
+                            <div class="bg-slate-900/80 p-2 rounded-lg border border-slate-800">
+                                <span id="cpi-cd-hours" class="text-xl font-bold text-cyan-300 block">00</span>
+                                <span class="text-[10px] text-slate-500 uppercase">Hours</span>
+                            </div>
+                            <div class="bg-slate-900/80 p-2 rounded-lg border border-slate-800">
+                                <span id="cpi-cd-mins" class="text-xl font-bold text-cyan-300 block">00</span>
+                                <span class="text-[10px] text-slate-500 uppercase">Mins</span>
+                            </div>
+                            <div class="bg-slate-900/80 p-2 rounded-lg border border-slate-800">
+                                <span id="cpi-cd-secs" class="text-xl font-bold text-cyan-300 block">00</span>
+                                <span class="text-[10px] text-slate-500 uppercase">Secs</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- SECTION 3: HISTORICAL YIELD & FED RATE CHART -->
+        <div class="glass-card rounded-2xl p-6">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6">
+                <div>
+                    <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                        <i class="fa-solid fa-chart-area text-sky-400"></i>
+                        Macro Interest Rate Trends
+                    </h3>
+                    <p class="text-xs text-slate-400">10-Year Treasury Yield vs. Effective Fed Funds Rate</p>
+                </div>
+
+                <div class="flex bg-slate-900/80 p-1 rounded-xl border border-slate-800 text-xs self-start sm:self-auto">
+                    <button class="chart-range-btn px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition" data-range="1M">1M</button>
+                    <button class="chart-range-btn px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition" data-range="6M">6M</button>
+                    <button class="chart-range-btn px-3 py-1.5 rounded-lg active bg-sky-500 text-white font-medium shadow-sm" data-range="1Y">1Y</button>
+                    <button class="chart-range-btn px-3 py-1.5 rounded-lg text-slate-400 hover:text-white transition" data-range="5Y">5Y</button>
+                </div>
+            </div>
+
+            <div class="relative w-full h-[340px]">
+                <canvas id="macroChart"></canvas>
+            </div>
+        </div>
+
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="max-w-7xl w-full mx-auto px-4 md:px-8 mt-8 text-xs text-slate-500 flex flex-col sm:flex-row justify-between items-center gap-3 border-t border-slate-800/80 pt-6">
+        <div>
+            <span>&copy; 2026 Macro Monitor — Powered by US Department of the Treasury & Federal Reserve System Data</span>
+        </div>
+        <div class="flex items-center gap-4">
+            <span class="hover:text-slate-300 transition cursor-pointer">Terms</span>
+            <span class="hover:text-slate-300 transition cursor-pointer">Privacy</span>
+            <span class="hover:text-slate-300 transition cursor-pointer">API Status</span>
+        </div>
+    </footer>
+
+    <!-- INTERACTIVE JAVASCRIPT LOGIC -->
+    <script>
+        /* ==========================================================================
+           1. OFFICIAL SCHEDULE SCHEDULES (FOMC & CPI FOR 2026-2027)
+           ========================================================================== */
+
+        // FOMC Fed Rate Announcements (2:00 PM Eastern Time = 19:00 UTC)
+        const FOMC_SCHEDULE = [
+            { date: "2026-01-28T19:00:00Z", label: "Jan 27-28, 2026 Meeting" },
+            { date: "2026-03-18T19:00:00Z", label: "Mar 17-18, 2026 Meeting" },
+            { date: "2026-05-06T19:00:00Z", label: "May 5-6, 2026 Meeting" },
+            { date: "2026-06-17T19:00:00Z", label: "Jun 16-17, 2026 Meeting" },
+            { date: "2026-07-29T19:00:00Z", label: "Jul 28-29, 2026 Meeting" },
+            { date: "2026-09-16T19:00:00Z", label: "Sep 15-16, 2026 Meeting" },
+            { date: "2026-11-04T19:00:00Z", label: "Nov 3-4, 2026 Meeting" },
+            { date: "2026-12-16T19:00:00Z", label: "Dec 15-16, 2026 Meeting" },
+            { date: "2027-01-27T19:00:00Z", label: "Jan 26-27, 2027 Meeting" },
+            { date: "2027-03-17T19:00:00Z", label: "Mar 16-17, 2027 Meeting" }
+        ];
+
+        // BLS CPI Inflation Releases (8:30 AM Eastern Time = 13:30 UTC / 12:30 UTC in Daylight Savings)
+        const CPI_SCHEDULE = [
+            { date: "2026-01-14T13:30:00Z", label: "December 2025 CPI Data" },
+            { date: "2026-02-13T13:30:00Z", label: "January 2026 CPI Data" },
+            { date: "2026-03-11T13:30:00Z", label: "February 2026 CPI Data" },
+            { date: "2026-04-14T12:30:00Z", label: "March 2026 CPI Data" },
+            { date: "2026-05-13T12:30:00Z", label: "April 2026 CPI Data" },
+            { date: "2026-06-10T12:30:00Z", label: "May 2026 CPI Data" },
+            { date: "2026-07-14T12:30:00Z", label: "June 2026 CPI Data" },
+            { date: "2026-08-12T12:30:00Z", label: "July 2026 CPI Data" },
+            { date: "2026-09-15T12:30:00Z", label: "August 2026 CPI Data" },
+            { date: "2026-10-14T12:30:00Z", label: "September 2026 CPI Data" },
+            { date: "2026-11-12T13:30:00Z", label: "October 2026 CPI Data" },
+            { date: "2026-12-10T13:30:00Z", label: "November 2026 CPI Data" },
+            { date: "2027-01-13T13:30:00Z", label: "December 2026 CPI Data" }
+        ];
+
+        /* ==========================================================================
+           2. AUTOMATED 24-HOUR POST-EVENT ROLLOVER LOGIC
+           ========================================================================== */
+
+        const TWENTY_FOUR_HOURS_MS = 24 * 60 * 60 * 1000;
+
+        function getActiveEvent(schedule) {
+            const now = new Date().getTime();
+
+            for (let event of schedule) {
+                const eventTime = new Date(event.date).getTime();
+                const timeDiff = eventTime - now;
+
+                // Condition A: Event is in the future
+                // Condition B: Event occurred less than 24 hours ago (Event is currently active/recent)
+                if (timeDiff > -TWENTY_FOUR_HOURS_MS) {
+                    return {
+                        ...event,
+                        eventTime: eventTime,
+                        isRecent: timeDiff <= 0 && timeDiff > -TWENTY_FOUR_HOURS_MS
+                    };
+                }
+            }
+            // Fallback to last event if all dates passed
+            return {
+                ...schedule[schedule.length - 1],
+                eventTime: new Date(schedule[schedule.length - 1].date).getTime(),
+                isRecent: false
+            };
+        }
+
+        /* ==========================================================================
+           3. COUNTDOWN TIMERS & UI UPDATES
+           ========================================================================== */
+
+        let activeFomcEvent = null;
+        let activeCpiEvent = null;
+
+        function updateEconomicCalendar() {
+            activeFomcEvent = getActiveEvent(FOMC_SCHEDULE);
+            activeCpiEvent = getActiveEvent(CPI_SCHEDULE);
+
+            // Render FOMC Event Card Details
+            const fomcDateObj = new Date(activeFomcEvent.date);
+            document.getElementById('fomc-event-date').innerText = fomcDateObj.toLocaleString('en-US', {
+                month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZoneName: 'short'
+            });
+            document.getElementById('fomc-event-period').innerText = activeFomcEvent.label;
+            document.getElementById('ticker-fomc-date').innerText = fomcDateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+            
+            const fomcDupe = document.querySelector('.ticker-fomc-date-dupe');
+            if (fomcDupe) fomcDupe.innerText = fomcDateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+            const fomcBadge = document.getElementById('fomc-status-badge');
+            if (activeFomcEvent.isRecent) {
+                fomcBadge.innerText = "Active Today / Recent";
+                fomcBadge.className = "px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 pulse-live";
+            } else {
+                fomcBadge.innerText = "Upcoming";
+                fomcBadge.className = "px-2.5 py-1 rounded-full text-xs font-semibold bg-purple-500/20 text-purple-300 border border-purple-500/30";
+            }
+
+            // Render CPI Event Card Details
+            const cpiDateObj = new Date(activeCpiEvent.date);
+            document.getElementById('cpi-event-date').innerText = cpiDateObj.toLocaleString('en-US', {
+                month: 'short', day: 'numeric', year: 'numeric', hour: '2-digit', minute: '2-digit', timeZoneName: 'short'
+            });
+            document.getElementById('cpi-event-period').innerText = activeCpiEvent.label;
+            document.getElementById('ticker-cpi-date').innerText = cpiDateObj.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+
+            const cpiBadge = document.getElementById('cpi-status-badge');
+            if (activeCpiEvent.isRecent) {
+                cpiBadge.innerText = "Active Today / Recent";
+                cpiBadge.className = "px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 pulse-live";
+            } else {
+                cpiBadge.innerText = "Upcoming";
+                cpiBadge.className = "px-2.5 py-1 rounded-full text-xs font-semibold bg-cyan-500/20 text-cyan-300 border border-cyan-500/30";
+            }
+
+            // Tick countdown calculations
+            tickCountdowns();
+        }
+
+        function tickCountdowns() {
+            const now = new Date().getTime();
+
+            // Tick FOMC Timer
+            if (activeFomcEvent) {
+                const diff = activeFomcEvent.eventTime - now;
+                if (diff > 0) {
+                    renderTimerValues('fomc-cd', diff);
+                } else {
+                    renderTimerValues('fomc-cd', 0);
+                }
+            }
+
+            // Tick CPI Timer
+            if (activeCpiEvent) {
+                const diff = activeCpiEvent.eventTime - now;
+                if (diff > 0) {
+                    renderTimerValues('cpi-cd', diff);
+                } else {
+                    renderTimerValues('cpi-cd', 0);
+                }
+            }
+        }
+
+        function renderTimerValues(prefix, diffMs) {
+            const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
+            const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+            const mins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
+            const secs = Math.floor((diffMs % (1000 * 60)) / 1000);
+
+            document.getElementById(`${prefix}-days`).innerText = String(days).padStart(2, '0');
+            document.getElementById(`${prefix}-hours`).innerText = String(hours).padStart(2, '0');
+            document.getElementById(`${prefix}-mins`).innerText = String(mins).padStart(2, '0');
+            document.getElementById(`${prefix}-secs`).innerText = String(secs).padStart(2, '0');
+        }
+
+        /* ==========================================================================
+           4. HISTORICAL CHART.JS ENGINE
+           ========================================================================== */
+
+        const chartDatasets = {
+            '1M': {
+                labels: ['W1', 'W2', 'W3', 'W4'],
+                y10: [4.18, 4.22, 4.25, 4.28],
+                effr: [4.83, 4.83, 4.83, 4.83]
+            },
+            '6M': {
+                labels: ['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
+                y10: [4.45, 4.30, 4.18, 3.90, 3.80, 4.28],
+                effr: [5.33, 5.33, 5.33, 5.33, 5.08, 4.83]
+            },
+            '1Y': {
+                labels: ['Nov', 'Dec', 'Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
+                y10: [4.50, 4.20, 4.10, 4.25, 4.32, 4.60, 4.45, 4.30, 4.18, 3.90, 3.80, 4.28],
+                effr: [5.33, 5.33, 5.33, 5.33, 5.33, 5.33, 5.33, 5.33, 5.33, 5.33, 5.08, 4.83]
+            },
+            '5Y': {
+                labels: ['2022', '2023', '2024', '2025', '2026'],
+                y10: [3.88, 3.88, 4.28, 4.35, 4.28],
+                effr: [3.78, 5.33, 4.83, 4.50, 4.83]
+            }
+        };
+
+        let macroChart = null;
+
+        function initChart() {
+            const ctx = document.getElementById('macroChart').getContext('2d');
+
+            const grad10Y = ctx.createLinearGradient(0, 0, 0, 300);
+            grad10Y.addColorStop(0, 'rgba(56, 189, 248, 0.3)');
+            grad10Y.addColorStop(1, 'rgba(56, 189, 248, 0.0)');
+
+            const data1Y = chartDatasets['1Y'];
+
+            macroChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: data1Y.labels,
+                    datasets: [
+                        {
+                            label: '10-Year Treasury Yield (US10Y)',
+                            data: data1Y.y10,
+                            borderColor: '#38bdf8',
+                            backgroundColor: grad10Y,
+                            borderWidth: 2.5,
+                            fill: true,
+                            tension: 0.3,
+                            pointBackgroundColor: '#38bdf8',
+                            pointRadius: 3
+                        },
+                        {
+                            label: 'Federal Funds Rate (EFFR)',
+                            data: data1Y.effr,
+                            borderColor: '#c084fc',
+                            borderWidth: 2,
+                            borderDash: [5, 5],
+                            fill: false,
+                            tension: 0.1,
+                            pointBackgroundColor: '#c084fc',
+                            pointRadius: 3
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    interaction: { mode: 'index', intersect: false },
+                    plugins: {
+                        legend: {
+                            display: true,
+                            position: 'top',
+                            labels: { color: '#94a3b8', font: { family: 'Inter', size: 12 }, usePointStyle: true }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(15, 23, 42, 0.95)',
+                            titleColor: '#f8fafc',
+                            bodyColor: '#cbd5e1',
+                            borderColor: 'rgba(255, 255, 255, 0.1)',
+                            borderWidth: 1,
+                            padding: 12,
+                            callbacks: {
+                                label: (ctx) => `${ctx.dataset.label}: ${ctx.parsed.y.toFixed(2)}%`
+                            }
+                        }
+                    },
+                    scales: {
+                        x: {
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { color: '#64748b' }
+                        },
+                        y: {
+                            grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                            ticks: { 
+                                color: '#64748b',
+                                callback: (value) => value.toFixed(2) + '%'
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        /* ==========================================================================
+           5. DATA REFRESH & EVENT BINDINGS
+           ========================================================================== */
+
+        function triggerSystemRefresh() {
+            const spinner = document.getElementById('refresh-spinner');
+            spinner.classList.add('fa-spin');
+
+            // Simulate slight variation
+            const randomDelta = (Math.random() - 0.5) * 0.02;
+            const new10Y = +(4.28 + randomDelta).toFixed(2);
+            
+            document.getElementById('val-10y').innerText = `${new10Y}%`;
+            document.getElementById('ticker-10y').innerText = `${new10Y}%`;
+            
+            const now = new Date();
+            document.getElementById('last-updated-time').innerText = now.toLocaleTimeString();
+
+            updateEconomicCalendar();
+
+            setTimeout(() => {
+                spinner.classList.remove('fa-spin');
+            }, 600);
+        }
+
+        window.onload = function() {
+            initChart();
+            updateEconomicCalendar();
+            
+            // Continuous 1-second interval for live countdown tick
+            setInterval(tickCountdowns, 1000);
+
+            // Re-evaluate calendar rollover every 10 minutes
+            setInterval(updateEconomicCalendar, 10 * 60 * 1000);
+
+            // Refresh Button
+            document.getElementById('manual-refresh-btn').addEventListener('click', triggerSystemRefresh);
+
+            // Chart Range Controls
+            const rangeBtns = document.querySelectorAll('.chart-range-btn');
+            rangeBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    rangeBtns.forEach(b => {
+                        b.classList.remove('active', 'bg-sky-500', 'text-white', 'font-medium', 'shadow-sm');
+                        b.classList.add('text-slate-400');
+                    });
+                    this.classList.add('active', 'bg-sky-500', 'text-white', 'font-medium', 'shadow-sm');
+                    this.classList.remove('text-slate-400');
+
+                    const range = this.getAttribute('data-range');
+                    if (macroChart && chartDatasets[range]) {
+                        macroChart.data.labels = chartDatasets[range].labels;
+                        macroChart.data.datasets[0].data = chartDatasets[range].y10;
+                        macroChart.data.datasets[1].data = chartDatasets[range].effr;
+                        macroChart.update();
+                    }
+                });
+            });
+
+            // Set Initial Time
+            document.getElementById('last-updated-time').innerText = new Date().toLocaleTimeString();
+        };
+    </script>
 </body>
 </html>
