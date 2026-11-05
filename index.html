@@ -1,558 +1,857 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>chernogongore.com | S&P 500 & Macro Analytics</title>
-    
-    <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
-    
-    <!-- Chart.js CDN -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Personal investment calculators for percentage change and loss recovery.">
+  <title>chernogongore.com | Portfolio Calculators</title>
 
-    <style>
-        :root {
-            --bg-base: #0B0F19;
-            --bg-card: rgba(21, 28, 44, 0.65);
-            --border-glass: rgba(255, 255, 255, 0.08);
-            --border-highlight: rgba(99, 102, 241, 0.3);
-            
-            --text-main: #F3F4F6;
-            --text-muted: #9CA3AF;
-            --text-dim: #6B7280;
-            
-            --accent-primary: #6366F1;
-            --accent-green: #10B981;
-            --accent-red: #EF4444;
-            --accent-cyan: #06B6D4;
-            --accent-gold: #F59E0B;
-        }
+  <style>
+    :root {
+      --background: #0b1120;
+      --card: #151f32;
+      --input: #0e1728;
+      --border: #29364d;
+      --text: #f1f5f9;
+      --muted: #94a3b8;
+      --blue: #3b82f6;
+      --green: #34d399;
+      --red: #fb7185;
+    }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
-        }
+    * {
+      box-sizing: border-box;
+    }
 
-        body {
-            background-color: var(--bg-base);
-            color: var(--text-main);
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            background-image: 
-                radial-gradient(circle at 15% 15%, rgba(99, 102, 241, 0.12) 0%, transparent 40%),
-                radial-gradient(circle at 85% 85%, rgba(6, 182, 212, 0.08) 0%, transparent 40%);
-            background-attachment: fixed;
-        }
+    body {
+      margin: 0;
+      background: var(--background);
+      color: var(--text);
+      font-family: Inter, -apple-system, BlinkMacSystemFont,
+        "Segoe UI", Arial, sans-serif;
+      min-height: 100vh;
+    }
 
-        .navbar {
-            border-bottom: 1px solid var(--border-glass);
-            background: rgba(11, 15, 25, 0.8);
-            backdrop-filter: blur(12px);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-        }
+    header {
+      background: #10192b;
+      border-bottom: 1px solid var(--border);
+      padding: 22px 6%;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
 
-        .nav-container {
-            max-width: 1200px;
-            margin: 0 auto;
-            padding: 1rem 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+    .logo {
+      font-size: 24px;
+      font-weight: 800;
+      letter-spacing: -0.5px;
+    }
 
-        .brand-logo {
-            font-size: 1.25rem;
-            font-weight: 700;
-            text-decoration: none;
-            color: var(--text-main);
-            letter-spacing: -0.02em;
-        }
+    .logo span {
+      color: var(--blue);
+    }
 
-        .accent-dot { color: var(--accent-primary); }
+    .header-label {
+      color: var(--muted);
+      font-size: 13px;
+    }
 
-        .live-status-pill {
-            display: inline-flex;
-            align-items: center;
-            gap: 0.5rem;
-            background: rgba(16, 185, 129, 0.1);
-            border: 1px solid rgba(16, 185, 129, 0.3);
-            padding: 0.35rem 0.75rem;
-            border-radius: 9999px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            color: var(--accent-green);
-        }
+    main {
+      max-width: 1100px;
+      margin: 60px auto;
+      padding: 0 20px;
+    }
 
-        .status-dot {
-            width: 8px;
-            height: 8px;
-            background-color: var(--accent-green);
-            border-radius: 50%;
-            box-shadow: 0 0 8px var(--accent-green);
-            animation: pulse 2s infinite;
-        }
+    .eyebrow {
+      color: var(--blue);
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
 
-        @keyframes pulse {
-            0% { opacity: 1; }
-            50% { opacity: 0.4; }
-            100% { opacity: 1; }
-        }
+    h1 {
+      font-size: clamp(30px, 5vw, 46px);
+      letter-spacing: -1px;
+      margin: 12px 0;
+    }
 
-        .main-container {
-            max-width: 1200px;
-            margin: 2rem auto;
-            padding: 0 1.5rem;
-            width: 100%;
-            flex: 1;
-        }
+    .subtitle {
+      color: var(--muted);
+      font-size: 16px;
+      line-height: 1.7;
+      margin-bottom: 35px;
+    }
 
-        .section-header {
-            margin-bottom: 2rem;
-        }
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 24px;
+      align-items: stretch;
+    }
 
-        .section-header h1 {
-            font-size: 2rem;
-            font-weight: 700;
-            margin-bottom: 0.5rem;
-        }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 28px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.12);
+    }
 
-        .subtitle {
-            color: var(--text-muted);
-            font-size: 0.95rem;
-        }
+    .card h2 {
+      margin: 0 0 12px;
+      font-size: 20px;
+    }
 
-        .glass-card {
-            background: var(--bg-card);
-            border: 1px solid var(--border-glass);
-            border-radius: 16px;
-            padding: 1.5rem;
-            backdrop-filter: blur(12px);
-        }
+    .card-description {
+      color: var(--muted);
+      font-size: 13px;
+      line-height: 1.6;
+      margin-bottom: 25px;
+      min-height: 42px;
+    }
 
-        .metrics-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-            gap: 1.25rem;
-            margin-bottom: 2rem;
-        }
+    .field {
+      margin-bottom: 20px;
+    }
 
-        .metric-card {
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
-        }
+    label {
+      display: block;
+      font-size: 13px;
+      color: var(--muted);
+      margin-bottom: 10px;
+    }
 
-        .metric-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 1rem;
-        }
+    .input-wrapper {
+      display: flex;
+      align-items: center;
+      background: var(--input);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
 
-        .metric-title {
-            font-size: 0.8rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-        }
+    .input-wrapper:focus-within {
+      border-color: var(--blue);
+    }
 
-        .metric-badge {
-            font-size: 0.75rem;
-            padding: 0.2rem 0.5rem;
-            border-radius: 6px;
-            font-weight: 600;
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--text-muted);
-        }
+    .input-prefix {
+      padding-left: 16px;
+      color: var(--muted);
+      font-size: 19px;
+    }
 
-        .metric-value {
-            font-size: 1.85rem;
-            font-weight: 700;
-            font-family: 'JetBrains Mono', monospace;
-            color: var(--text-main);
-            margin-bottom: 0.5rem;
-        }
+    .input-suffix {
+      padding-right: 16px;
+      color: var(--muted);
+      font-size: 19px;
+    }
 
-        .metric-footer {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            font-size: 0.825rem;
-        }
+    input {
+      background: transparent;
+      border: none;
+      outline: none;
+      padding: 16px 12px;
+      width: 100%;
+      min-width: 0;
+      font-size: 20px;
+      font-weight: 600;
+      color: white;
+      font-family: inherit;
+    }
 
-        .positive { color: var(--accent-green); }
-        .negative { color: var(--accent-red); }
+    input::-webkit-inner-spin-button,
+    input::-webkit-outer-spin-button {
+      -webkit-appearance: none;
+      margin: 0;
+    }
 
-        .dashboard-grid {
-            display: grid;
-            grid-template-columns: 2fr 1fr;
-            gap: 1.5rem;
-            margin-bottom: 2rem;
-        }
+    input[type="number"] {
+      appearance: textfield;
+      -moz-appearance: textfield;
+    }
 
-        @media (max-width: 900px) {
-            .dashboard-grid { grid-template-columns: 1fr; }
-        }
+    .button-row {
+      display: flex;
+      gap: 12px;
+      margin-top: 22px;
+    }
 
-        .chart-card {
-            display: flex;
-            flex-direction: column;
-        }
+    button {
+      padding: 13px 20px;
+      border-radius: 9px;
+      border: none;
+      font-size: 14px;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
 
-        .card-title {
-            font-size: 1.1rem;
-            font-weight: 600;
-            margin-bottom: 1.5rem;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-        }
+    .primary {
+      background: var(--blue);
+      color: white;
+      flex: 1;
+    }
 
-        .chart-wrapper {
-            position: relative;
-            flex: 1;
-            min-height: 280px;
-        }
+    .primary:hover {
+      background: #2563eb;
+    }
 
-        .calendar-card {
-            display: flex;
-            flex-direction: column;
-            gap: 1.25rem;
-        }
+    .secondary {
+      background: #253249;
+      color: white;
+    }
 
-        .event-box {
-            background: rgba(255, 255, 255, 0.02);
-            border: 1px solid var(--border-glass);
-            border-radius: 12px;
-            padding: 1.25rem;
-            transition: border-color 0.2s ease;
-        }
+    .secondary:hover {
+      background: #334155;
+    }
 
-        .event-box.active-event {
-            border-color: var(--border-highlight);
-            background: rgba(99, 102, 241, 0.05);
-        }
+    .result-box {
+      background: var(--input);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 22px;
+      margin-top: 25px;
+    }
 
-        .event-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 0.75rem;
-        }
+    .result-label {
+      color: var(--muted);
+      font-size: 13px;
+      margin-bottom: 12px;
+    }
 
-        .event-type {
-            font-size: 0.8rem;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--accent-cyan);
-        }
+    .percentage {
+      font-size: clamp(32px, 5vw, 44px);
+      font-weight: 800;
+      letter-spacing: -1px;
+      overflow-wrap: anywhere;
+    }
 
-        .event-status {
-            font-size: 0.75rem;
-            padding: 0.2rem 0.5rem;
-            border-radius: 4px;
-            background: rgba(99, 102, 241, 0.2);
-            color: #A5B4FC;
-            font-weight: 600;
-        }
+    .positive {
+      color: var(--green);
+    }
 
-        .event-date {
-            font-size: 1.1rem;
-            font-weight: 700;
-            margin-bottom: 0.25rem;
-        }
+    .negative {
+      color: var(--red);
+    }
 
-        .event-details {
-            font-size: 0.85rem;
-            color: var(--text-muted);
-            margin-bottom: 0.75rem;
-        }
+    .neutral {
+      color: var(--text);
+    }
 
-        .countdown-timer {
-            font-family: 'JetBrains Mono', monospace;
-            font-size: 0.875rem;
-            color: var(--accent-gold);
-            background: rgba(245, 158, 11, 0.1);
-            padding: 0.4rem 0.6rem;
-            border-radius: 6px;
-            display: inline-block;
-        }
+    .status {
+      font-size: 13px;
+      font-weight: 600;
+      margin-top: 8px;
+    }
 
-        .app-footer {
-            border-top: 1px solid var(--border-glass);
-            padding: 1.5rem;
-            text-align: center;
-            color: var(--text-dim);
-            font-size: 0.85rem;
-            margin-top: auto;
-        }
-    </style>
+    .separator {
+      height: 1px;
+      background: var(--border);
+      margin: 22px 0;
+    }
+
+    .detail-row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      align-items: center;
+      font-size: 14px;
+      margin: 15px 0;
+    }
+
+    .detail-row span:first-child {
+      color: var(--muted);
+    }
+
+    .detail-row strong {
+      font-size: 15px;
+      text-align: right;
+      overflow-wrap: anywhere;
+    }
+
+    .progress-track {
+      height: 9px;
+      background: #29364d;
+      border-radius: 20px;
+      overflow: hidden;
+      margin-top: 22px;
+    }
+
+    .progress-fill {
+      height: 100%;
+      width: 0%;
+      background: var(--green);
+      border-radius: 20px;
+      transition: width 0.3s ease;
+    }
+
+    .progress-caption {
+      color: var(--muted);
+      font-size: 12px;
+      margin-top: 10px;
+    }
+
+    .formula-card {
+      margin-top: 24px;
+    }
+
+    .formula-card h2 {
+      margin-bottom: 15px;
+    }
+
+    .formula-card p {
+      color: var(--muted);
+      line-height: 1.8;
+      font-size: 14px;
+    }
+
+    .formula {
+      background: var(--input);
+      border: 1px solid var(--border);
+      padding: 20px;
+      border-radius: 10px;
+      text-align: center;
+      font-size: 15px;
+      font-weight: 600;
+      overflow-wrap: anywhere;
+    }
+
+    .recovery-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 15px;
+    }
+
+    .recovery-table th,
+    .recovery-table td {
+      padding: 13px;
+      text-align: left;
+      border-bottom: 1px solid var(--border);
+      font-size: 14px;
+    }
+
+    .recovery-table th {
+      color: var(--muted);
+      font-weight: 600;
+    }
+
+    .recovery-table td:last-child {
+      color: var(--green);
+      font-weight: 700;
+    }
+
+    footer {
+      text-align: center;
+      color: var(--muted);
+      font-size: 12px;
+      padding: 30px 15px;
+    }
+
+    @media (max-width: 750px) {
+      main {
+        margin: 35px auto;
+      }
+
+      .dashboard {
+        grid-template-columns: 1fr;
+      }
+
+      .card {
+        padding: 22px;
+      }
+
+      .header-label {
+        display: none;
+      }
+
+      .card-description {
+        min-height: auto;
+      }
+    }
+  </style>
 </head>
+
 <body>
 
-    <header class="navbar">
-        <div class="nav-container">
-            <a href="#" class="brand-logo">chernogongore<span class="accent-dot">.com</span></a>
-            <div class="live-status-pill">
-                <span class="status-dot"></span>
-                <span id="market-status-text">LIVE MACRO DASHBOARD</span>
-            </div>
-        </div>
-    </header>
+  <!-- WEBSITE HEADER -->
+  <header>
+    <div class="logo">
+      cherno<span>gongore.com</span>
+    </div>
 
-    <main class="main-container">
-        
-        <div class="section-header">
-            <h1>S&P 500, Treasury Yields & Fed Watch</h1>
-            <p class="subtitle">Real-time benchmark rates, broad market equity performance, and automated economic release tracking.</p>
-        </div>
+    <div class="header-label">
+      Personal Investment Tools
+    </div>
+  </header>
 
-        <div class="metrics-grid">
-            <!-- 10-Yr Treasury Yield -->
-            <div class="glass-card metric-card">
-                <div class="metric-header">
-                    <span class="metric-title">10-Yr Yield</span>
-                    <span class="metric-badge">US10Y</span>
-                </div>
-                <div class="metric-value" id="us10y-val">5.00%</div>
-                <div class="metric-footer">
-                    <span class="positive" id="us10y-change">+0.04% (+0.80%)</span>
-                    <span style="color: var(--text-dim);">Today</span>
-                </div>
-            </div>
+  <main>
 
-            <!-- Fed Funds Rate -->
-            <div class="glass-card metric-card">
-                <div class="metric-header">
-                    <span class="metric-title">Fed Funds Rate</span>
-                    <span class="metric-badge">Target Range</span>
-                </div>
-                <div class="metric-value" id="fed-rate-val">3.75% - 4.00%</div>
-                <div class="metric-footer">
-                    <span style="color: var(--text-muted);">Effective Rate: 3.88%</span>
-                </div>
-            </div>
+    <div class="eyebrow">Investment Dashboard</div>
 
-            <!-- S&P 500 Index -->
-            <div class="glass-card metric-card">
-                <div class="metric-header">
-                    <span class="metric-title">S&P 500 Index</span>
-                    <span class="metric-badge">SPX</span>
-                </div>
-                <div class="metric-value" id="spx-val">7,696.89</div>
-                <div class="metric-footer">
-                    <span class="positive" id="spx-change">+30.44 (+0.40%)</span>
-                    <span style="color: var(--text-dim);">Today</span>
-                </div>
-            </div>
+    <h1>Portfolio Calculators</h1>
 
-            <!-- Bitcoin -->
-            <div class="glass-card metric-card">
-                <div class="metric-header">
-                    <span class="metric-title">Bitcoin</span>
-                    <span class="metric-badge">BTC / USD</span>
-                </div>
-                <div class="metric-value" id="btc-val">$80,771</div>
-                <div class="metric-footer">
-                    <span class="negative" id="btc-change">-1.20%</span>
-                    <span style="color: var(--text-dim);">24h</span>
-                </div>
-            </div>
+    <p class="subtitle">
+      Calculate investment gains, losses, and the percentage
+      returns required to recover from a market decline.
+    </p>
+
+    <div class="dashboard">
+
+      <!-- CALCULATOR 1 -->
+      <section class="card">
+
+        <h2>Percentage Change Calculator</h2>
+
+        <p class="card-description">
+          Calculate the percentage increase or decrease
+          between two dollar amounts.
+        </p>
+
+        <div class="field">
+          <label for="initialAmount">Initial Amount</label>
+
+          <div class="input-wrapper">
+            <span class="input-prefix">$</span>
+            <input
+              id="initialAmount"
+              type="number"
+              value="100"
+              step="any"
+              placeholder="100.00"
+            >
+          </div>
         </div>
 
-        <div class="dashboard-grid">
-            <!-- S&P 500 Trend Chart (Replaces 10-Year Treasury Chart) -->
-            <div class="glass-card chart-card">
-                <div class="card-title">
-                    <span>S&P 500 Performance Index (SPX)</span>
-                    <span style="font-size: 0.8rem; font-weight: 400; color: var(--text-dim);">6-Month History</span>
-                </div>
-                <div class="chart-wrapper">
-                    <canvas id="spxChart"></canvas>
-                </div>
-            </div>
+        <div class="field">
+          <label for="finalAmount">Final Amount</label>
 
-            <!-- Automated Economic Calendar -->
-            <div class="glass-card calendar-card">
-                <div class="card-title">
-                    <span>Economic Calendar</span>
-                    <span style="font-size: 0.8rem; font-weight: 400; color: var(--text-dim);">Auto-Rollover</span>
-                </div>
-
-                <!-- Next Fed Meeting Card -->
-                <div class="event-box active-event" id="fomc-card">
-                    <div class="event-header">
-                        <span class="event-type">FOMC Rate Decision</span>
-                        <span class="event-status" id="fomc-badge">Upcoming</span>
-                    </div>
-                    <div class="event-date" id="fomc-date">Dec 8–9, 2026</div>
-                    <div class="event-details" id="fomc-time">Announcement: Dec 9 at 2:00 PM ET</div>
-                    <div class="countdown-timer" id="fomc-timer">Calculating countdown...</div>
-                </div>
-
-                <!-- Next CPI Release Card -->
-                <div class="event-box" id="cpi-card">
-                    <div class="event-header">
-                        <span class="event-type" style="color: var(--accent-gold);">CPI Inflation Data</span>
-                        <span class="event-status" id="cpi-badge">Upcoming</span>
-                    </div>
-                    <div class="event-date" id="cpi-date">Nov 10, 2026</div>
-                    <div class="event-details" id="cpi-time">Release: Nov 10 at 8:30 AM ET</div>
-                    <div class="countdown-timer" id="cpi-timer">Calculating countdown...</div>
-                </div>
-            </div>
+          <div class="input-wrapper">
+            <span class="input-prefix">$</span>
+            <input
+              id="finalAmount"
+              type="number"
+              value="120"
+              step="any"
+              placeholder="120.00"
+            >
+          </div>
         </div>
 
-    </main>
+        <div class="button-row">
+          <button class="primary" id="calculateChange">
+            Calculate
+          </button>
 
-    <footer class="app-footer">
-        <p>&copy; 2026 chernogongore.com — Macro Analytics & Market Intelligence</p>
-    </footer>
+          <button class="secondary" id="resetChange">
+            Reset
+          </button>
+        </div>
 
-    <script>
-        // Schedule of Events (2026–2027)
-        const FOMC_SCHEDULE = [
-            { label: "Dec 8–9, 2026", targetIso: "2026-12-09T14:00:00-05:00", details: "Announcement: Dec 9 at 2:00 PM ET" },
-            { label: "Jan 27–28, 2027", targetIso: "2027-01-28T14:00:00-05:00", details: "Announcement: Jan 28 at 2:00 PM ET" },
-            { label: "Mar 16–17, 2027", targetIso: "2027-03-17T14:00:00-05:00", details: "Announcement: Mar 17 at 2:00 PM ET" }
-        ];
+        <div class="result-box" aria-live="polite">
 
-        const CPI_SCHEDULE = [
-            { label: "Nov 10, 2026", targetIso: "2026-11-10T08:30:00-05:00", details: "Release: Oct CPI at 8:30 AM ET" },
-            { label: "Dec 11, 2026", targetIso: "2026-12-11T08:30:00-05:00", details: "Release: Nov CPI at 8:30 AM ET" },
-            { label: "Jan 13, 2027", targetIso: "2027-01-13T08:30:00-05:00", details: "Release: Dec CPI at 8:30 AM ET" }
-        ];
+          <div class="result-label">Percentage Change</div>
 
-        // Automated 24-Hour Post-Event Rollover Logic
-        function getNextEvent(schedule) {
-            const now = new Date();
-            const ROLLOVER_BUFFER_MS = 24 * 60 * 60 * 1000; // 24 Hours
+          <div id="percentageResult" class="percentage positive">
+            +20.00%
+          </div>
 
-            for (let event of schedule) {
-                const eventTime = new Date(event.targetIso);
-                if (now.getTime() < (eventTime.getTime() + ROLLOVER_BUFFER_MS)) {
-                    return event;
-                }
-            }
-            return schedule[schedule.length - 1];
-        }
+          <div id="changeStatus" class="status positive">
+            ↗ Increase
+          </div>
 
-        function updateCountdowns() {
-            // Process FOMC Event
-            const fomcEvent = getNextEvent(FOMC_SCHEDULE);
-            document.getElementById('fomc-date').textContent = fomcEvent.label;
-            document.getElementById('fomc-time').textContent = fomcEvent.details;
-            renderTimer('fomc-timer', 'fomc-badge', fomcEvent.targetIso);
+          <div class="separator"></div>
 
-            // Process CPI Event
-            const cpiEvent = getNextEvent(CPI_SCHEDULE);
-            document.getElementById('cpi-date').textContent = cpiEvent.label;
-            document.getElementById('cpi-time').textContent = cpiEvent.details;
-            renderTimer('cpi-timer', 'cpi-badge', cpiEvent.targetIso);
-        }
+          <div class="detail-row">
+            <span>Initial Amount</span>
+            <strong id="initialDisplay">$100.00</strong>
+          </div>
 
-        function renderTimer(timerId, badgeId, isoString) {
-            const now = new Date();
-            const target = new Date(isoString);
-            const diffMs = target - now;
-            const pastMs = now - target;
-            const ROLLOVER_BUFFER_MS = 24 * 60 * 60 * 1000;
+          <div class="detail-row">
+            <span>Final Amount</span>
+            <strong id="finalDisplay">$120.00</strong>
+          </div>
 
-            const timerEl = document.getElementById(timerId);
-            const badgeEl = document.getElementById(badgeId);
+          <div class="detail-row">
+            <span>Dollar Change</span>
+            <strong id="dollarResult" class="positive">
+              +$20.00
+            </strong>
+          </div>
 
-            if (diffMs > 0) {
-                const days = Math.floor(diffMs / (1000 * 60 * 60 * 24));
-                const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-                const mins = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60));
-                const secs = Math.floor((diffMs % (1000 * 60)) / 1000);
+          <div class="progress-track">
+            <div id="changeProgress" class="progress-fill"></div>
+          </div>
 
-                timerEl.textContent = `T- ${days}d ${hours}h ${mins}m ${secs}s`;
-                badgeEl.textContent = "Upcoming";
-            } else if (pastMs <= ROLLOVER_BUFFER_MS) {
-                timerEl.textContent = "Active / Release Completed Today";
-                badgeEl.textContent = "Active Today";
-            }
-        }
+          <div class="progress-caption">
+            Change magnitude (bar capped at 100%)
+          </div>
 
-        // Initialize S&P 500 (SPX) Chart
-        function initSpxChart() {
-            const ctx = document.getElementById('spxChart').getContext('2d');
-            
-            // Gradient fill for SPX chart
-            const gradient = ctx.createLinearGradient(0, 0, 0, 260);
-            gradient.addColorStop(0, 'rgba(16, 185, 129, 0.25)');
-            gradient.addColorStop(1, 'rgba(16, 185, 129, 0.0)');
+        </div>
 
-            new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: ['May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct'],
-                    datasets: [{
-                        label: 'S&P 500 Index (SPX)',
-                        data: [6850.12, 7120.45, 7310.80, 7240.15, 7510.30, 7696.89],
-                        borderColor: '#10B981',
-                        backgroundColor: gradient,
-                        borderWidth: 2.5,
-                        fill: true,
-                        tension: 0.35,
-                        pointRadius: 4,
-                        pointHoverRadius: 6,
-                        pointBackgroundColor: '#10B981'
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: { 
-                        legend: { display: false },
-                        tooltip: {
-                            backgroundColor: 'rgba(11, 15, 25, 0.95)',
-                            titleColor: '#F3F4F6',
-                            bodyColor: '#10B981',
-                            borderColor: 'rgba(255, 255, 255, 0.1)',
-                            borderWidth: 1,
-                            callbacks: {
-                                label: function(context) {
-                                    return ` SPX: ${context.parsed.y.toLocaleString('en-US', { minimumFractionDigits: 2 })}`;
-                                }
-                            }
-                        }
-                    },
-                    scales: {
-                        x: { 
-                            grid: { color: 'rgba(255, 255, 255, 0.04)' }, 
-                            ticks: { color: '#9CA3AF' } 
-                        },
-                        y: { 
-                            grid: { color: 'rgba(255, 255, 255, 0.04)' }, 
-                            ticks: { 
-                                color: '#9CA3AF',
-                                callback: function(value) {
-                                    return value.toLocaleString('en-US');
-                                }
-                            } 
-                        }
-                    }
-                }
-            });
-        }
+      </section>
 
-        document.addEventListener('DOMContentLoaded', () => {
-            initSpxChart();
-            updateCountdowns();
-            setInterval(updateCountdowns, 1000);
-        });
-    </script>
+      <!-- CALCULATOR 2 -->
+      <section class="card">
+
+        <h2>Loss Recovery Calculator</h2>
+
+        <p class="card-description">
+          Find out how much your investment must gain
+          to recover from a percentage loss.
+        </p>
+
+        <div class="field">
+          <label for="lossInput">Percentage Loss</label>
+
+          <div class="input-wrapper">
+            <input
+              id="lossInput"
+              type="number"
+              value="50"
+              min="0"
+              max="100"
+              step="any"
+              placeholder="50"
+            >
+            <span class="input-suffix">%</span>
+          </div>
+        </div>
+
+        <div class="button-row">
+          <button class="primary" id="calculateRecovery">
+            Calculate
+          </button>
+
+          <button class="secondary" id="resetRecovery">
+            Reset
+          </button>
+        </div>
+
+        <div class="result-box" aria-live="polite">
+
+          <div class="result-label">
+            Required Gain to Break Even
+          </div>
+
+          <div id="recoveryResult" class="percentage positive">
+            +100.00%
+          </div>
+
+          <div id="recoveryStatus" class="status positive">
+            Required recovery gain
+          </div>
+
+          <div class="separator"></div>
+
+          <div class="detail-row">
+            <span>Percentage Lost</span>
+            <strong id="lossDisplay">50.00%</strong>
+          </div>
+
+          <div class="detail-row">
+            <span>Investment Value Remaining</span>
+            <strong id="remainingDisplay">50.00%</strong>
+          </div>
+
+          <div class="detail-row">
+            <span>Gain Required</span>
+            <strong id="requiredDisplay" class="positive">
+              +100.00%
+            </strong>
+          </div>
+
+          <div class="progress-track">
+            <div id="recoveryProgress" class="progress-fill"></div>
+          </div>
+
+          <div class="progress-caption">
+            Required gain magnitude (bar capped at 100%)
+          </div>
+
+        </div>
+
+      </section>
+
+    </div>
+
+    <!-- FORMULAS -->
+    <section class="card formula-card">
+
+      <h2>Percentage Change Formula</h2>
+
+      <div class="formula">
+        ((Final Amount - Initial Amount) / Initial Amount) × 100
+      </div>
+
+      <p>
+        Example: An investment increasing from $100 to $120
+        represents a 20% gain.
+      </p>
+
+    </section>
+
+    <section class="card formula-card">
+
+      <h2>Loss Recovery Formula</h2>
+
+      <div class="formula">
+        (Percentage Loss / (100 - Percentage Loss)) × 100
+      </div>
+
+      <p>
+        Example: If an investment falls by 50%, it must
+        increase by 100% from its reduced value to break even.
+      </p>
+
+    </section>
+
+    <!-- REFERENCE TABLE -->
+    <section class="card formula-card">
+
+      <h2>Loss Recovery Reference Table</h2>
+
+      <table class="recovery-table">
+
+        <thead>
+          <tr>
+            <th>Percentage Loss</th>
+            <th>Required Gain</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          <tr><td>10%</td><td>+11.11%</td></tr>
+          <tr><td>20%</td><td>+25.00%</td></tr>
+          <tr><td>30%</td><td>+42.86%</td></tr>
+          <tr><td>40%</td><td>+66.67%</td></tr>
+          <tr><td>50%</td><td>+100.00%</td></tr>
+          <tr><td>60%</td><td>+150.00%</td></tr>
+          <tr><td>70%</td><td>+233.33%</td></tr>
+          <tr><td>80%</td><td>+400.00%</td></tr>
+          <tr><td>90%</td><td>+900.00%</td></tr>
+          <tr><td>100%</td><td>Impossible</td></tr>
+        </tbody>
+
+      </table>
+
+    </section>
+
+  </main>
+
+  <footer>
+    © 2026 chernogongore.com | Personal Investment Tools
+  </footer>
+
+  <script>
+    // -----------------------------
+    // SHARED UTILITIES
+    // -----------------------------
+
+    const moneyFormatter = new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency: "USD",
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    });
+
+    function formatMoney(value) {
+      return moneyFormatter.format(value);
+    }
+
+    function setColor(element, type) {
+      element.classList.remove("positive", "negative", "neutral");
+      element.classList.add(type);
+    }
+
+    function validNumber(input) {
+      return input.value.trim() !== "" &&
+        Number.isFinite(Number(input.value));
+    }
+
+    // -----------------------------
+    // CALCULATOR 1
+    // PERCENTAGE CHANGE
+    // -----------------------------
+
+    const initialInput = document.getElementById("initialAmount");
+    const finalInput = document.getElementById("finalAmount");
+
+    const percentageResult = document.getElementById("percentageResult");
+    const changeStatus = document.getElementById("changeStatus");
+    const initialDisplay = document.getElementById("initialDisplay");
+    const finalDisplay = document.getElementById("finalDisplay");
+    const dollarResult = document.getElementById("dollarResult");
+    const changeProgress = document.getElementById("changeProgress");
+
+    function calculatePercentageChange() {
+      const initial = Number(initialInput.value);
+      const final = Number(finalInput.value);
+
+      if (
+        !validNumber(initialInput) ||
+        !validNumber(finalInput) ||
+        initial <= 0 ||
+        final < 0
+      ) {
+        percentageResult.textContent = "—";
+        changeStatus.textContent =
+          "Enter a positive initial amount and nonnegative final amount";
+        initialDisplay.textContent = "—";
+        finalDisplay.textContent = "—";
+        dollarResult.textContent = "—";
+        changeProgress.style.width = "0%";
+
+        setColor(percentageResult, "neutral");
+        setColor(changeStatus, "neutral");
+        setColor(dollarResult, "neutral");
+        return;
+      }
+
+      const difference = final - initial;
+      const percentage = (difference / initial) * 100;
+
+      const type =
+        difference > 0 ? "positive" :
+        difference < 0 ? "negative" :
+        "neutral";
+
+      const sign = difference > 0 ? "+" : "";
+
+      percentageResult.textContent =
+        sign + percentage.toFixed(2) + "%";
+
+      changeStatus.textContent =
+        difference > 0 ? "↗ Increase" :
+        difference < 0 ? "↘ Decrease" :
+        "— No Change";
+
+      initialDisplay.textContent = formatMoney(initial);
+      finalDisplay.textContent = formatMoney(final);
+
+      dollarResult.textContent =
+        sign + formatMoney(difference);
+
+      setColor(percentageResult, type);
+      setColor(changeStatus, type);
+      setColor(dollarResult, type);
+
+      changeProgress.style.width =
+        Math.min(Math.abs(percentage), 100) + "%";
+
+      changeProgress.style.background =
+        difference > 0 ? "var(--green)" :
+        difference < 0 ? "var(--red)" :
+        "var(--muted)";
+    }
+
+    function resetPercentageChange() {
+      initialInput.value = "100";
+      finalInput.value = "120";
+      calculatePercentageChange();
+    }
+
+    document.getElementById("calculateChange")
+      .addEventListener("click", calculatePercentageChange);
+
+    document.getElementById("resetChange")
+      .addEventListener("click", resetPercentageChange);
+
+    initialInput.addEventListener("input", calculatePercentageChange);
+    finalInput.addEventListener("input", calculatePercentageChange);
+
+    // -----------------------------
+    // CALCULATOR 2
+    // LOSS RECOVERY
+    // -----------------------------
+
+    const lossInput = document.getElementById("lossInput");
+    const recoveryResult = document.getElementById("recoveryResult");
+    const recoveryStatus = document.getElementById("recoveryStatus");
+    const lossDisplay = document.getElementById("lossDisplay");
+    const remainingDisplay = document.getElementById("remainingDisplay");
+    const requiredDisplay = document.getElementById("requiredDisplay");
+    const recoveryProgress = document.getElementById("recoveryProgress");
+
+    function calculateLossRecovery() {
+      const loss = Number(lossInput.value);
+
+      if (
+        !validNumber(lossInput) ||
+        loss < 0 ||
+        loss > 100
+      ) {
+        recoveryResult.textContent = "—";
+        recoveryStatus.textContent = "Enter a loss between 0% and 100%";
+        lossDisplay.textContent = "—";
+        remainingDisplay.textContent = "—";
+        requiredDisplay.textContent = "—";
+        recoveryProgress.style.width = "0%";
+        setColor(recoveryResult, "neutral");
+        setColor(recoveryStatus, "neutral");
+        setColor(requiredDisplay, "neutral");
+        return;
+      }
+
+      const remaining = 100 - loss;
+
+      lossDisplay.textContent = loss.toFixed(2) + "%";
+      remainingDisplay.textContent = remaining.toFixed(2) + "%";
+
+      if (loss === 100) {
+        recoveryResult.textContent = "∞";
+        recoveryStatus.textContent =
+          "Recovery from zero is impossible";
+        requiredDisplay.textContent = "Impossible";
+        recoveryProgress.style.width = "100%";
+        recoveryProgress.style.background = "var(--red)";
+
+        setColor(recoveryResult, "negative");
+        setColor(recoveryStatus, "negative");
+        setColor(requiredDisplay, "negative");
+        return;
+      }
+
+      const requiredGain = (loss / (100 - loss)) * 100;
+
+      recoveryResult.textContent =
+        "+" + requiredGain.toFixed(2) + "%";
+
+      recoveryStatus.textContent =
+        "Gain required to break even";
+
+      requiredDisplay.textContent =
+        "+" + requiredGain.toFixed(2) + "%";
+
+      setColor(recoveryResult, "positive");
+      setColor(recoveryStatus, "positive");
+      setColor(requiredDisplay, "positive");
+
+      recoveryProgress.style.width =
+        Math.min(requiredGain, 100) + "%";
+
+      recoveryProgress.style.background = "var(--green)";
+    }
+
+    function resetLossRecovery() {
+      lossInput.value = "50";
+      calculateLossRecovery();
+    }
+
+    document.getElementById("calculateRecovery")
+      .addEventListener("click", calculateLossRecovery);
+
+    document.getElementById("resetRecovery")
+      .addEventListener("click", resetLossRecovery);
+
+    lossInput.addEventListener("input", calculateLossRecovery);
+
+    // Initialize both calculators
+    calculatePercentageChange();
+    calculateLossRecovery();
+  </script>
+
 </body>
 </html>
