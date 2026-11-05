@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Personal investment calculators for percentage change and loss recovery.">
+  <meta name="description" content="Investment percentage change and loss recovery calculators.">
   <title>chernogongore.com | Portfolio Calculators</title>
 
   <style>
@@ -26,11 +26,11 @@
 
     body {
       margin: 0;
+      min-height: 100vh;
       background: var(--background);
       color: var(--text);
       font-family: Inter, -apple-system, BlinkMacSystemFont,
         "Segoe UI", Arial, sans-serif;
-      min-height: 100vh;
     }
 
     header {
@@ -160,6 +160,12 @@
       font-weight: 600;
       color: white;
       font-family: inherit;
+    }
+
+    input::placeholder {
+      color: #64748b;
+      font-size: 15px;
+      font-weight: 400;
     }
 
     input::-webkit-inner-spin-button,
@@ -418,9 +424,8 @@
             <input
               id="initialAmount"
               type="number"
-              value="100"
               step="any"
-              placeholder="100.00"
+              placeholder="Enter initial amount"
             >
           </div>
         </div>
@@ -433,9 +438,8 @@
             <input
               id="finalAmount"
               type="number"
-              value="120"
               step="any"
-              placeholder="120.00"
+              placeholder="Enter final amount"
             >
           </div>
         </div>
@@ -454,31 +458,29 @@
 
           <div class="result-label">Percentage Change</div>
 
-          <div id="percentageResult" class="percentage positive">
-            +20.00%
+          <div id="percentageResult" class="percentage neutral">
+            —
           </div>
 
-          <div id="changeStatus" class="status positive">
-            ↗ Increase
+          <div id="changeStatus" class="status neutral">
+            Enter two amounts to calculate
           </div>
 
           <div class="separator"></div>
 
           <div class="detail-row">
             <span>Initial Amount</span>
-            <strong id="initialDisplay">$100.00</strong>
+            <strong id="initialDisplay">—</strong>
           </div>
 
           <div class="detail-row">
             <span>Final Amount</span>
-            <strong id="finalDisplay">$120.00</strong>
+            <strong id="finalDisplay">—</strong>
           </div>
 
           <div class="detail-row">
             <span>Dollar Change</span>
-            <strong id="dollarResult" class="positive">
-              +$20.00
-            </strong>
+            <strong id="dollarResult" class="neutral">—</strong>
           </div>
 
           <div class="progress-track">
@@ -510,11 +512,10 @@
             <input
               id="lossInput"
               type="number"
-              value="50"
               min="0"
               max="100"
               step="any"
-              placeholder="50"
+              placeholder="Enter percentage loss"
             >
             <span class="input-suffix">%</span>
           </div>
@@ -536,31 +537,29 @@
             Required Gain to Break Even
           </div>
 
-          <div id="recoveryResult" class="percentage positive">
-            +100.00%
+          <div id="recoveryResult" class="percentage neutral">
+            —
           </div>
 
-          <div id="recoveryStatus" class="status positive">
-            Required recovery gain
+          <div id="recoveryStatus" class="status neutral">
+            Enter a percentage loss to calculate
           </div>
 
           <div class="separator"></div>
 
           <div class="detail-row">
             <span>Percentage Lost</span>
-            <strong id="lossDisplay">50.00%</strong>
+            <strong id="lossDisplay">—</strong>
           </div>
 
           <div class="detail-row">
             <span>Investment Value Remaining</span>
-            <strong id="remainingDisplay">50.00%</strong>
+            <strong id="remainingDisplay">—</strong>
           </div>
 
           <div class="detail-row">
             <span>Gain Required</span>
-            <strong id="requiredDisplay" class="positive">
-              +100.00%
-            </strong>
+            <strong id="requiredDisplay" class="neutral">—</strong>
           </div>
 
           <div class="progress-track">
@@ -748,8 +747,8 @@
     }
 
     function resetPercentageChange() {
-      initialInput.value = "100";
-      finalInput.value = "120";
+      initialInput.value = "";
+      finalInput.value = "";
       calculatePercentageChange();
     }
 
@@ -784,11 +783,13 @@
         loss > 100
       ) {
         recoveryResult.textContent = "—";
-        recoveryStatus.textContent = "Enter a loss between 0% and 100%";
+        recoveryStatus.textContent =
+          "Enter a loss between 0% and 100%";
         lossDisplay.textContent = "—";
         remainingDisplay.textContent = "—";
         requiredDisplay.textContent = "—";
         recoveryProgress.style.width = "0%";
+
         setColor(recoveryResult, "neutral");
         setColor(recoveryStatus, "neutral");
         setColor(requiredDisplay, "neutral");
@@ -836,7 +837,7 @@
     }
 
     function resetLossRecovery() {
-      lossInput.value = "50";
+      lossInput.value = "";
       calculateLossRecovery();
     }
 
@@ -848,7 +849,7 @@
 
     lossInput.addEventListener("input", calculateLossRecovery);
 
-    // Initialize both calculators
+    // Initialize both calculators with empty inputs
     calculatePercentageChange();
     calculateLossRecovery();
   </script>
