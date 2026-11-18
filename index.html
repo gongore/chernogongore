@@ -4,7 +4,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Personal investment dashboard with ETF market prices, percentage change calculator, and loss recovery calculator.">
+  <meta name="description" content="Personal investment dashboard with ETF prices and investment calculators.">
 
   <title>chernogongore.com | Portfolio Dashboard</title>
 
@@ -114,11 +114,11 @@
     .market-toggle {
       display: flex;
       align-items: center;
-      gap: 12px;
-      padding: 12px 14px;
+      gap: 8px;
+      padding: 8px 12px;
       cursor: pointer;
       list-style: none;
-      min-height: 72px;
+      min-height: 62px;
     }
 
     .market-toggle::-webkit-details-marker {
@@ -133,24 +133,10 @@
       background: rgba(255,255,255,0.025);
     }
 
-    .ticker-group {
-      flex-shrink: 0;
-    }
-
-    .ticker {
-      font-size: 19px;
-      font-weight: 800;
-    }
-
-    .ticker-description {
-      color: var(--muted);
-      font-size: 11px;
-      margin-top: 4px;
-    }
-
     .compact-quote {
       flex: 1;
       min-width: 0;
+      width: 100%;
       overflow: hidden;
     }
 
@@ -535,17 +521,9 @@
       }
 
       .market-toggle {
-        padding: 10px 12px;
-        min-height: 62px;
+        padding: 8px 10px;
+        min-height: 58px;
         gap: 8px;
-      }
-
-      .ticker {
-        font-size: 17px;
-      }
-
-      .ticker-description {
-        display: none;
       }
 
       .market-arrow {
@@ -611,14 +589,6 @@
       <details class="market-card">
 
         <summary class="market-toggle">
-
-          <div class="ticker-group">
-            <div class="ticker">IVV</div>
-
-            <div class="ticker-description">
-              iShares Core S&P 500 ETF
-            </div>
-          </div>
 
           <div class="compact-quote">
 
@@ -690,14 +660,6 @@
       <details class="market-card">
 
         <summary class="market-toggle">
-
-          <div class="ticker-group">
-            <div class="ticker">TQQQ</div>
-
-            <div class="ticker-description">
-              ProShares UltraPro QQQ
-            </div>
-          </div>
 
           <div class="compact-quote">
 
