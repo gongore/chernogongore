@@ -4,12 +4,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <meta name="description" content="Investment percentage change and loss recovery calculators.">
-  <title>chernogongore.com | Portfolio Calculators</title>
+
+  <meta name="description"
+    content="Personal investment dashboard with live ETF quotes, percentage change calculator, and loss recovery calculator.">
+
+  <title>chernogongore.com | Investment Dashboard</title>
 
   <style>
     :root {
       --background: #0b1120;
+      --header: #10192b;
       --card: #151f32;
       --input: #0e1728;
       --border: #29364d;
@@ -29,23 +33,29 @@
       min-height: 100vh;
       background: var(--background);
       color: var(--text);
-      font-family: Inter, -apple-system, BlinkMacSystemFont,
-        "Segoe UI", Arial, sans-serif;
+      font-family: Inter, -apple-system,
+        BlinkMacSystemFont, "Segoe UI",
+        Arial, sans-serif;
     }
 
+    /* HEADER */
+
     header {
-      background: #10192b;
+      background: var(--header);
       border-bottom: 1px solid var(--border);
       padding: 22px 6%;
       display: flex;
-      align-items: center;
       justify-content: space-between;
+      align-items: center;
+      gap: 20px;
     }
 
     .logo {
       font-size: 24px;
       font-weight: 800;
       letter-spacing: -0.5px;
+      text-decoration: none;
+      color: white;
     }
 
     .logo span {
@@ -57,9 +67,11 @@
       font-size: 13px;
     }
 
+    /* MAIN CONTENT */
+
     main {
-      max-width: 1100px;
-      margin: 60px auto;
+      max-width: 1150px;
+      margin: 55px auto;
       padding: 0 20px;
     }
 
@@ -83,6 +95,91 @@
       line-height: 1.7;
       margin-bottom: 35px;
     }
+
+    .section-title {
+      font-size: 25px;
+      margin: 0 0 8px;
+    }
+
+    .section-description {
+      color: var(--muted);
+      font-size: 14px;
+      line-height: 1.6;
+      margin: 0 0 22px;
+    }
+
+    /* LIVE MARKET SECTION */
+
+    .market-section {
+      margin-bottom: 45px;
+    }
+
+    .market-heading {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 15px;
+      margin-bottom: 20px;
+    }
+
+    .market-heading .section-description {
+      margin-bottom: 0;
+    }
+
+    .market-indicator {
+      color: var(--green);
+      font-size: 12px;
+      white-space: nowrap;
+    }
+
+    .market-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      background: var(--green);
+      border-radius: 50%;
+      margin-right: 6px;
+    }
+
+    .market-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 24px;
+    }
+
+    .market-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 24px;
+      min-width: 0;
+      overflow: hidden;
+    }
+
+    .market-card h3 {
+      font-size: 24px;
+      margin: 0 0 6px;
+    }
+
+    .market-card > p {
+      color: var(--muted);
+      font-size: 13px;
+      margin: 0 0 18px;
+    }
+
+    .market-card .tradingview-widget-container {
+      width: 100%;
+      min-width: 0;
+    }
+
+    .market-disclaimer {
+      color: var(--muted);
+      font-size: 12px;
+      line-height: 1.6;
+      margin-top: 15px;
+    }
+
+    /* CALCULATOR GRID */
 
     .dashboard {
       display: grid;
@@ -111,6 +208,8 @@
       margin-bottom: 25px;
       min-height: 42px;
     }
+
+    /* INPUT FIELDS */
 
     .field {
       margin-bottom: 20px;
@@ -179,6 +278,8 @@
       -moz-appearance: textfield;
     }
 
+    /* BUTTONS */
+
     .button-row {
       display: flex;
       gap: 12px;
@@ -213,6 +314,8 @@
     .secondary:hover {
       background: #334155;
     }
+
+    /* CALCULATION RESULTS */
 
     .result-box {
       background: var(--input);
@@ -251,6 +354,7 @@
       font-size: 13px;
       font-weight: 600;
       margin-top: 8px;
+      line-height: 1.5;
     }
 
     .separator {
@@ -262,8 +366,8 @@
     .detail-row {
       display: flex;
       justify-content: space-between;
-      gap: 12px;
       align-items: center;
+      gap: 12px;
       font-size: 14px;
       margin: 15px 0;
     }
@@ -277,6 +381,8 @@
       text-align: right;
       overflow-wrap: anywhere;
     }
+
+    /* PROGRESS BARS */
 
     .progress-track {
       height: 9px;
@@ -299,6 +405,8 @@
       font-size: 12px;
       margin-top: 10px;
     }
+
+    /* FORMULAS */
 
     .formula-card {
       margin-top: 24px;
@@ -325,6 +433,8 @@
       overflow-wrap: anywhere;
     }
 
+    /* RECOVERY TABLE */
+
     .recovery-table {
       width: 100%;
       border-collapse: collapse;
@@ -349,23 +459,30 @@
       font-weight: 700;
     }
 
+    /* FOOTER */
+
     footer {
       text-align: center;
       color: var(--muted);
       font-size: 12px;
       padding: 30px 15px;
+      border-top: 1px solid var(--border);
     }
+
+    /* MOBILE RESPONSIVENESS */
 
     @media (max-width: 750px) {
       main {
         margin: 35px auto;
       }
 
-      .dashboard {
+      .dashboard,
+      .market-grid {
         grid-template-columns: 1fr;
       }
 
-      .card {
+      .card,
+      .market-card {
         padding: 22px;
       }
 
@@ -376,6 +493,15 @@
       .card-description {
         min-height: auto;
       }
+
+      .market-heading {
+        align-items: flex-start;
+        flex-direction: column;
+      }
+
+      .logo {
+        font-size: 21px;
+      }
     }
   </style>
 </head>
@@ -383,10 +509,11 @@
 <body>
 
   <!-- WEBSITE HEADER -->
+
   <header>
-    <div class="logo">
+    <a class="logo" href="./">
       cherno<span>gongore.com</span>
-    </div>
+    </a>
 
     <div class="header-label">
       Personal Investment Tools
@@ -395,18 +522,135 @@
 
   <main>
 
-    <div class="eyebrow">Investment Dashboard</div>
+    <div class="eyebrow">
+      Investment Dashboard
+    </div>
 
-    <h1>Portfolio Calculators</h1>
+    <h1>Portfolio Dashboard</h1>
 
     <p class="subtitle">
-      Calculate investment gains, losses, and the percentage
-      returns required to recover from a market decline.
+      Monitor ETF market prices, calculate investment
+      gains and losses, and determine the returns
+      required to recover from market declines.
+    </p>
+
+    <!-- ========================= -->
+    <!-- LIVE ETF MARKET PRICES    -->
+    <!-- ========================= -->
+
+    <section class="market-section">
+
+      <div class="market-heading">
+        <div>
+          <h2 class="section-title">
+            Live ETF Prices
+          </h2>
+
+          <p class="section-description">
+            Latest available market quotes for IVV and TQQQ.
+          </p>
+        </div>
+
+        <div class="market-indicator">
+          <span class="market-dot"></span>
+          Market Data
+        </div>
+      </div>
+
+      <div class="market-grid">
+
+        <!-- IVV MARKET PRICE -->
+
+        <div class="market-card">
+
+          <h3>IVV</h3>
+
+          <p>iShares Core S&P 500 ETF</p>
+
+          <div class="tradingview-widget-container">
+
+            <div
+              class="tradingview-widget-container__widget">
+            </div>
+
+            <script
+              type="text/javascript"
+              src="https://s3.tradingview.com/external-embedding/embed-widget-symbol-info.js"
+              async>
+            {
+              "symbol": "AMEX:IVV",
+              "width": "100%",
+              "locale": "en",
+              "colorTheme": "dark",
+              "isTransparent": true
+            }
+            </script>
+
+          </div>
+
+        </div>
+
+        <!-- TQQQ MARKET PRICE -->
+
+        <div class="market-card">
+
+          <h3>TQQQ</h3>
+
+          <p>ProShares UltraPro QQQ</p>
+
+          <div class="tradingview-widget-container">
+
+            <div
+              class="tradingview-widget-container__widget">
+            </div>
+
+            <script
+              type="text/javascript"
+              src="https://s3.tradingview.com/external-embedding/embed-widget-symbol-info.js"
+              async>
+            {
+              "symbol": "NASDAQ:TQQQ",
+              "width": "100%",
+              "locale": "en",
+              "colorTheme": "dark",
+              "isTransparent": true
+            }
+            </script>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <p class="market-disclaimer">
+        Market data provided by TradingView.
+        Quotes may be delayed and may not update
+        outside trading hours. Check the provider's
+        exchange and quote information before trading.
+      </p>
+
+    </section>
+
+    <!-- ========================= -->
+    <!-- INVESTMENT CALCULATORS    -->
+    <!-- ========================= -->
+
+    <h2 class="section-title">
+      Investment Calculators
+    </h2>
+
+    <p class="section-description">
+      Calculate investment performance and loss recovery.
     </p>
 
     <div class="dashboard">
 
-      <!-- CALCULATOR 1 -->
+      <!-- ========================= -->
+      <!-- CALCULATOR 1              -->
+      <!-- PERCENTAGE CHANGE         -->
+      <!-- ========================= -->
+
       <section class="card">
 
         <h2>Percentage Change Calculator</h2>
@@ -417,34 +661,51 @@
         </p>
 
         <div class="field">
-          <label for="initialAmount">Initial Amount</label>
+
+          <label for="initialAmount">
+            Initial Amount
+          </label>
 
           <div class="input-wrapper">
+
             <span class="input-prefix">$</span>
+
             <input
               id="initialAmount"
               type="number"
+              min="0"
               step="any"
               placeholder="Enter initial amount"
             >
+
           </div>
+
         </div>
 
         <div class="field">
-          <label for="finalAmount">Final Amount</label>
+
+          <label for="finalAmount">
+            Final Amount
+          </label>
 
           <div class="input-wrapper">
+
             <span class="input-prefix">$</span>
+
             <input
               id="finalAmount"
               type="number"
+              min="0"
               step="any"
               placeholder="Enter final amount"
             >
+
           </div>
+
         </div>
 
         <div class="button-row">
+
           <button class="primary" id="calculateChange">
             Calculate
           </button>
@@ -452,17 +713,24 @@
           <button class="secondary" id="resetChange">
             Reset
           </button>
+
         </div>
 
         <div class="result-box" aria-live="polite">
 
-          <div class="result-label">Percentage Change</div>
+          <div class="result-label">
+            Percentage Change
+          </div>
 
-          <div id="percentageResult" class="percentage neutral">
+          <div
+            id="percentageResult"
+            class="percentage neutral">
             —
           </div>
 
-          <div id="changeStatus" class="status neutral">
+          <div
+            id="changeStatus"
+            class="status neutral">
             Enter two amounts to calculate
           </div>
 
@@ -480,11 +748,19 @@
 
           <div class="detail-row">
             <span>Dollar Change</span>
-            <strong id="dollarResult" class="neutral">—</strong>
+
+            <strong
+              id="dollarResult"
+              class="neutral">
+              —
+            </strong>
           </div>
 
           <div class="progress-track">
-            <div id="changeProgress" class="progress-fill"></div>
+            <div
+              id="changeProgress"
+              class="progress-fill">
+            </div>
           </div>
 
           <div class="progress-caption">
@@ -495,7 +771,11 @@
 
       </section>
 
-      <!-- CALCULATOR 2 -->
+      <!-- ========================= -->
+      <!-- CALCULATOR 2              -->
+      <!-- LOSS RECOVERY             -->
+      <!-- ========================= -->
+
       <section class="card">
 
         <h2>Loss Recovery Calculator</h2>
@@ -506,9 +786,13 @@
         </p>
 
         <div class="field">
-          <label for="lossInput">Percentage Loss</label>
+
+          <label for="lossInput">
+            Percentage Loss
+          </label>
 
           <div class="input-wrapper">
+
             <input
               id="lossInput"
               type="number"
@@ -517,18 +801,27 @@
               step="any"
               placeholder="Enter percentage loss"
             >
+
             <span class="input-suffix">%</span>
+
           </div>
+
         </div>
 
         <div class="button-row">
-          <button class="primary" id="calculateRecovery">
+
+          <button
+            class="primary"
+            id="calculateRecovery">
             Calculate
           </button>
 
-          <button class="secondary" id="resetRecovery">
+          <button
+            class="secondary"
+            id="resetRecovery">
             Reset
           </button>
+
         </div>
 
         <div class="result-box" aria-live="polite">
@@ -537,11 +830,15 @@
             Required Gain to Break Even
           </div>
 
-          <div id="recoveryResult" class="percentage neutral">
+          <div
+            id="recoveryResult"
+            class="percentage neutral">
             —
           </div>
 
-          <div id="recoveryStatus" class="status neutral">
+          <div
+            id="recoveryStatus"
+            class="status neutral">
             Enter a percentage loss to calculate
           </div>
 
@@ -559,11 +856,19 @@
 
           <div class="detail-row">
             <span>Gain Required</span>
-            <strong id="requiredDisplay" class="neutral">—</strong>
+
+            <strong
+              id="requiredDisplay"
+              class="neutral">
+              —
+            </strong>
           </div>
 
           <div class="progress-track">
-            <div id="recoveryProgress" class="progress-fill"></div>
+            <div
+              id="recoveryProgress"
+              class="progress-fill">
+            </div>
           </div>
 
           <div class="progress-caption">
@@ -576,18 +881,22 @@
 
     </div>
 
-    <!-- FORMULAS -->
+    <!-- ========================= -->
+    <!-- FORMULAS                  -->
+    <!-- ========================= -->
+
     <section class="card formula-card">
 
       <h2>Percentage Change Formula</h2>
 
       <div class="formula">
-        ((Final Amount - Initial Amount) / Initial Amount) × 100
+        ((Final Amount - Initial Amount)
+        / Initial Amount) × 100
       </div>
 
       <p>
-        Example: An investment increasing from $100 to $120
-        represents a 20% gain.
+        Example: An investment increasing from
+        $100 to $120 represents a 20% gain.
       </p>
 
     </section>
@@ -597,17 +906,22 @@
       <h2>Loss Recovery Formula</h2>
 
       <div class="formula">
-        (Percentage Loss / (100 - Percentage Loss)) × 100
+        (Percentage Loss /
+        (100 - Percentage Loss)) × 100
       </div>
 
       <p>
-        Example: If an investment falls by 50%, it must
-        increase by 100% from its reduced value to break even.
+        Example: If an investment falls by 50%,
+        it must increase by 100% from its reduced
+        value to break even.
       </p>
 
     </section>
 
-    <!-- REFERENCE TABLE -->
+    <!-- ========================= -->
+    <!-- LOSS RECOVERY TABLE       -->
+    <!-- ========================= -->
+
     <section class="card formula-card">
 
       <h2>Loss Recovery Reference Table</h2>
@@ -640,11 +954,19 @@
 
   </main>
 
+  <!-- FOOTER -->
+
   <footer>
-    © 2026 chernogongore.com | Personal Investment Tools
+    © <span id="currentYear"></span>
+    chernogongore.com | Personal Investment Tools
   </footer>
 
+  <!-- ========================= -->
+  <!-- JAVASCRIPT                -->
+  <!-- ========================= -->
+
   <script>
+
     // -----------------------------
     // SHARED UTILITIES
     // -----------------------------
@@ -661,13 +983,20 @@
     }
 
     function setColor(element, type) {
-      element.classList.remove("positive", "negative", "neutral");
+      element.classList.remove(
+        "positive",
+        "negative",
+        "neutral"
+      );
+
       element.classList.add(type);
     }
 
     function validNumber(input) {
-      return input.value.trim() !== "" &&
-        Number.isFinite(Number(input.value));
+      return (
+        input.value.trim() !== "" &&
+        Number.isFinite(Number(input.value))
+      );
     }
 
     // -----------------------------
@@ -675,17 +1004,32 @@
     // PERCENTAGE CHANGE
     // -----------------------------
 
-    const initialInput = document.getElementById("initialAmount");
-    const finalInput = document.getElementById("finalAmount");
+    const initialInput =
+      document.getElementById("initialAmount");
 
-    const percentageResult = document.getElementById("percentageResult");
-    const changeStatus = document.getElementById("changeStatus");
-    const initialDisplay = document.getElementById("initialDisplay");
-    const finalDisplay = document.getElementById("finalDisplay");
-    const dollarResult = document.getElementById("dollarResult");
-    const changeProgress = document.getElementById("changeProgress");
+    const finalInput =
+      document.getElementById("finalAmount");
+
+    const percentageResult =
+      document.getElementById("percentageResult");
+
+    const changeStatus =
+      document.getElementById("changeStatus");
+
+    const initialDisplay =
+      document.getElementById("initialDisplay");
+
+    const finalDisplay =
+      document.getElementById("finalDisplay");
+
+    const dollarResult =
+      document.getElementById("dollarResult");
+
+    const changeProgress =
+      document.getElementById("changeProgress");
 
     function calculatePercentageChange() {
+
       const initial = Number(initialInput.value);
       const final = Number(finalInput.value);
 
@@ -695,22 +1039,29 @@
         initial <= 0 ||
         final < 0
       ) {
+
         percentageResult.textContent = "—";
+
         changeStatus.textContent =
           "Enter a positive initial amount and nonnegative final amount";
+
         initialDisplay.textContent = "—";
         finalDisplay.textContent = "—";
         dollarResult.textContent = "—";
+
         changeProgress.style.width = "0%";
 
         setColor(percentageResult, "neutral");
         setColor(changeStatus, "neutral");
         setColor(dollarResult, "neutral");
+
         return;
       }
 
       const difference = final - initial;
-      const percentage = (difference / initial) * 100;
+
+      const percentage =
+        (difference / initial) * 100;
 
       const type =
         difference > 0 ? "positive" :
@@ -727,8 +1078,11 @@
         difference < 0 ? "↘ Decrease" :
         "— No Change";
 
-      initialDisplay.textContent = formatMoney(initial);
-      finalDisplay.textContent = formatMoney(final);
+      initialDisplay.textContent =
+        formatMoney(initial);
+
+      finalDisplay.textContent =
+        formatMoney(final);
 
       dollarResult.textContent =
         sign + formatMoney(difference);
@@ -747,34 +1101,63 @@
     }
 
     function resetPercentageChange() {
+
       initialInput.value = "";
       finalInput.value = "";
+
       calculatePercentageChange();
     }
 
     document.getElementById("calculateChange")
-      .addEventListener("click", calculatePercentageChange);
+      .addEventListener(
+        "click",
+        calculatePercentageChange
+      );
 
     document.getElementById("resetChange")
-      .addEventListener("click", resetPercentageChange);
+      .addEventListener(
+        "click",
+        resetPercentageChange
+      );
 
-    initialInput.addEventListener("input", calculatePercentageChange);
-    finalInput.addEventListener("input", calculatePercentageChange);
+    initialInput.addEventListener(
+      "input",
+      calculatePercentageChange
+    );
+
+    finalInput.addEventListener(
+      "input",
+      calculatePercentageChange
+    );
 
     // -----------------------------
     // CALCULATOR 2
     // LOSS RECOVERY
     // -----------------------------
 
-    const lossInput = document.getElementById("lossInput");
-    const recoveryResult = document.getElementById("recoveryResult");
-    const recoveryStatus = document.getElementById("recoveryStatus");
-    const lossDisplay = document.getElementById("lossDisplay");
-    const remainingDisplay = document.getElementById("remainingDisplay");
-    const requiredDisplay = document.getElementById("requiredDisplay");
-    const recoveryProgress = document.getElementById("recoveryProgress");
+    const lossInput =
+      document.getElementById("lossInput");
+
+    const recoveryResult =
+      document.getElementById("recoveryResult");
+
+    const recoveryStatus =
+      document.getElementById("recoveryStatus");
+
+    const lossDisplay =
+      document.getElementById("lossDisplay");
+
+    const remainingDisplay =
+      document.getElementById("remainingDisplay");
+
+    const requiredDisplay =
+      document.getElementById("requiredDisplay");
+
+    const recoveryProgress =
+      document.getElementById("recoveryProgress");
 
     function calculateLossRecovery() {
+
       const loss = Number(lossInput.value);
 
       if (
@@ -782,40 +1165,57 @@
         loss < 0 ||
         loss > 100
       ) {
+
         recoveryResult.textContent = "—";
+
         recoveryStatus.textContent =
           "Enter a loss between 0% and 100%";
+
         lossDisplay.textContent = "—";
         remainingDisplay.textContent = "—";
         requiredDisplay.textContent = "—";
+
         recoveryProgress.style.width = "0%";
 
         setColor(recoveryResult, "neutral");
         setColor(recoveryStatus, "neutral");
         setColor(requiredDisplay, "neutral");
+
         return;
       }
 
       const remaining = 100 - loss;
 
-      lossDisplay.textContent = loss.toFixed(2) + "%";
-      remainingDisplay.textContent = remaining.toFixed(2) + "%";
+      lossDisplay.textContent =
+        loss.toFixed(2) + "%";
+
+      remainingDisplay.textContent =
+        remaining.toFixed(2) + "%";
 
       if (loss === 100) {
+
         recoveryResult.textContent = "∞";
+
         recoveryStatus.textContent =
           "Recovery from zero is impossible";
-        requiredDisplay.textContent = "Impossible";
+
+        requiredDisplay.textContent =
+          "Impossible";
+
         recoveryProgress.style.width = "100%";
-        recoveryProgress.style.background = "var(--red)";
+
+        recoveryProgress.style.background =
+          "var(--red)";
 
         setColor(recoveryResult, "negative");
         setColor(recoveryStatus, "negative");
         setColor(requiredDisplay, "negative");
+
         return;
       }
 
-      const requiredGain = (loss / (100 - loss)) * 100;
+      const requiredGain =
+        (loss / (100 - loss)) * 100;
 
       recoveryResult.textContent =
         "+" + requiredGain.toFixed(2) + "%";
@@ -833,25 +1233,50 @@
       recoveryProgress.style.width =
         Math.min(requiredGain, 100) + "%";
 
-      recoveryProgress.style.background = "var(--green)";
+      recoveryProgress.style.background =
+        "var(--green)";
     }
 
     function resetLossRecovery() {
+
       lossInput.value = "";
+
       calculateLossRecovery();
     }
 
     document.getElementById("calculateRecovery")
-      .addEventListener("click", calculateLossRecovery);
+      .addEventListener(
+        "click",
+        calculateLossRecovery
+      );
 
     document.getElementById("resetRecovery")
-      .addEventListener("click", resetLossRecovery);
+      .addEventListener(
+        "click",
+        resetLossRecovery
+      );
 
-    lossInput.addEventListener("input", calculateLossRecovery);
+    lossInput.addEventListener(
+      "input",
+      calculateLossRecovery
+    );
 
-    // Initialize both calculators with empty inputs
+    // -----------------------------
+    // INITIALIZE WEBSITE
+    // -----------------------------
+
+    // Start calculators with empty inputs.
+    initialInput.value = "";
+    finalInput.value = "";
+    lossInput.value = "";
+
     calculatePercentageChange();
     calculateLossRecovery();
+
+    // Automatically update copyright year.
+    document.getElementById("currentYear")
+      .textContent = new Date().getFullYear();
+
   </script>
 
 </body>
